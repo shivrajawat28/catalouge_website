@@ -1,7 +1,6 @@
 import { chromium } from "playwright";
 import fs from "node:fs";
 import path from "node:path";
-import crypto from "node:crypto";
 
 const BASE_URL = process.env.BASE_URL || "http://localhost:3000";
 const OUTPUT_DIR = path.resolve("public/test-artifacts");
@@ -46,8 +45,10 @@ async function runTests() {
   });
 
   page.on("requestfailed", (request) => {
+    const url = request.url();
+    if (url.startsWith("chrome-extension://")) return;
     failedRequests.push({
-      url: request.url(),
+      url: url,
       failure: request.failure()?.errorText || "unknown",
     });
   });
@@ -484,6 +485,13 @@ async function runTests() {
     console.log("Running Test H: Brochure Images and Assets Integrity...");
     await page.goto(`${BASE_URL}/`, { waitUntil: "networkidle" });
 
+    // Scroll catalogue section into view so lazy-loaded product images hydrate
+    const catalogueSectionEl = await page.$("#catalogue");
+    if (catalogueSectionEl) {
+      await catalogueSectionEl.scrollIntoViewIfNeeded();
+      await page.waitForTimeout(600);
+    }
+
     // Collect all product images on the page
     const productImgs = await page.evaluate(() => {
       const imgs = Array.from(document.querySelectorAll("article img"));
@@ -529,48 +537,53 @@ async function runTests() {
       results.testH_brochure_images_and_assets.details.push(`ERROR: Missing brochure files: ${missingFiles.join(", ")}`);
     }
 
-    // Verify PDF Catalogue folder exists
+    // Verify PDF Catalogue file and rendered cover
     const catalogueDir = path.resolve("public/catalogue");
     const catalogueDirExists = fs.existsSync(catalogueDir);
     const configuredPdfPath = path.resolve("public/catalogue/advaita-tattva-catalogue.pdf");
     const configuredPdfExists = fs.existsSync(configuredPdfPath);
+    const configuredPdfSize = configuredPdfExists ? fs.statSync(configuredPdfPath).size : 0;
+    const coverPath = path.resolve("public/catalogue/catalogue-cover.jpg");
+    const coverExists = fs.existsSync(coverPath);
 
     results.testH_brochure_images_and_assets.details.push(
-      `Catalogue directory (public/catalogue): exists = ${catalogueDirExists}. Configured PDF (advaita-tattva-catalogue.pdf): exists = ${configuredPdfExists} (Awaiting user manual file placement).`
+      `Catalogue directory (public/catalogue): exists = ${catalogueDirExists}. PDF file: exists = ${configuredPdfExists}, size = ${configuredPdfSize} bytes. Cover image: exists = ${coverExists}.`
     );
 
-    // Filter out expected HEAD 404 for missing PDF file from failedRequests
-    const unexpectedFailedRequests = failedRequests.filter(
-      (r) => !r.url.includes("advaita-tattva-catalogue.pdf")
+    // Verify PDF file is directly accessible via HTTP 200 using request context
+    const pdfResponse = await context.request.get(`${BASE_URL}/catalogue/advaita-tattva-catalogue.pdf`);
+    const pdfHttpStatus = pdfResponse.status();
+    const pdfContentType = pdfResponse.headers()["content-type"];
+    results.testH_brochure_images_and_assets.details.push(
+      `Direct PDF HTTP GET status: ${pdfHttpStatus} (Expected 200), Content-Type: ${pdfContentType} (Expected application/pdf)`
     );
 
-    // Filter out expected 404 console logs for the absent PDF (which the user will manually drop in)
-    const unexpectedConsoleErrors = consoleErrors.filter(
-      (err) => !err.includes("advaita-tattva-catalogue.pdf") && !err.includes("404")
-    );
-
-    // Verify zero unexpected console errors
-    results.testH_brochure_images_and_assets.details.push(`Unexpected console errors captured: ${unexpectedConsoleErrors.length}`);
-    if (unexpectedConsoleErrors.length > 0) {
-      results.testH_brochure_images_and_assets.details.push(`Errors: ${unexpectedConsoleErrors.join("; ")}`);
+    // Verify zero console errors
+    results.testH_brochure_images_and_assets.details.push(`Console errors captured: ${consoleErrors.length}`);
+    if (consoleErrors.length > 0) {
+      results.testH_brochure_images_and_assets.details.push(`Errors: ${consoleErrors.join("; ")}`);
     }
 
-    // Verify zero unexpected failed requests
-    results.testH_brochure_images_and_assets.details.push(`Unexpected failed network requests: ${unexpectedFailedRequests.length}`);
-    if (unexpectedFailedRequests.length > 0) {
-      results.testH_brochure_images_and_assets.details.push(`Failed requests: ${JSON.stringify(unexpectedFailedRequests)}`);
+    // Verify zero failed requests
+    results.testH_brochure_images_and_assets.details.push(`Failed network requests: ${failedRequests.length}`);
+    if (failedRequests.length > 0) {
+      results.testH_brochure_images_and_assets.details.push(`Failed requests: ${JSON.stringify(failedRequests)}`);
     }
 
     // Verify NO external stock images are being requested
-    const externalImgRequests = unexpectedFailedRequests.filter((r) => !r.url.startsWith("http://localhost:3000"));
+    const externalImgRequests = failedRequests.filter((r) => !r.url.startsWith("http://localhost:"));
     results.testH_brochure_images_and_assets.details.push(`External image requests: ${externalImgRequests.length}`);
 
     if (
       failedImgs.length === 0 &&
       missingFiles.length === 0 &&
       catalogueDirExists &&
-      unexpectedConsoleErrors.length === 0 &&
-      unexpectedFailedRequests.length === 0
+      configuredPdfExists &&
+      configuredPdfSize > 10000000 &&
+      pdfHttpStatus === 200 &&
+      pdfContentType?.includes("application/pdf") &&
+      consoleErrors.length === 0 &&
+      failedRequests.length === 0
     ) {
       results.testH_brochure_images_and_assets.status = "PASS";
     } else {
@@ -792,7 +805,9 @@ async function runTests() {
       const hasHeading = text.includes("Explore Our Collection");
       const hasDescription = text.includes("Discover our collection of handcrafted brass sculptures, inspired by Indian heritage");
       const hasPlaceholder = text.includes("Official Catalogue Coming Soon");
-      const hasFileBadge = text.includes("advaita-tattva-catalogue.pdf");
+      const hasFileTargetText = text.includes("File target:");
+      const hasCoverImage = !!section.querySelector("img[src*='catalogue-cover.jpg']");
+      const hasBrochureBadge = text.includes("Official Brochure") && text.includes("21 Pages");
 
       const viewBtn = section.querySelector("a[href*='advaita-tattva-catalogue.pdf']:not([download])");
       const downloadBtn = section.querySelector("a[download]");
@@ -803,7 +818,9 @@ async function runTests() {
         hasHeading,
         hasDescription,
         hasPlaceholder,
-        hasFileBadge,
+        hasFileTargetText,
+        hasCoverImage,
+        hasBrochureBadge,
         viewHref: viewBtn ? viewBtn.getAttribute("href") : null,
         viewTarget: viewBtn ? viewBtn.getAttribute("target") : null,
         downloadHref: downloadBtn ? downloadBtn.getAttribute("href") : null,
@@ -812,7 +829,7 @@ async function runTests() {
     });
 
     results.testJ_about_redesign_and_catalogue_section.details.push(
-      `Catalogue Section Audit: exists=${catalogueSectionAudit?.exists}, eyebrow=${catalogueSectionAudit?.hasEyebrow}, heading=${catalogueSectionAudit?.hasHeading}, placeholder=${catalogueSectionAudit?.hasPlaceholder}`
+      `Catalogue Section Audit: exists=${catalogueSectionAudit?.exists}, eyebrow=${catalogueSectionAudit?.hasEyebrow}, heading=${catalogueSectionAudit?.hasHeading}, placeholder=${catalogueSectionAudit?.hasPlaceholder} (Expected false), fileTargetText=${catalogueSectionAudit?.hasFileTargetText} (Expected false), coverImage=${catalogueSectionAudit?.hasCoverImage} (Expected true), brochureBadge=${catalogueSectionAudit?.hasBrochureBadge} (Expected true)`
     );
     results.testJ_about_redesign_and_catalogue_section.details.push(
       `Catalogue Section View Link: ${catalogueSectionAudit?.viewHref} (target=${catalogueSectionAudit?.viewTarget})`
@@ -833,6 +850,9 @@ async function runTests() {
       await page.screenshot({ path: path.join(OUTPUT_DIR, "desktop_1440_catalogue_section.png"), fullPage: false });
     }
 
+    // Capture Full Home Page with PDF Preview
+    await page.screenshot({ path: path.join(OUTPUT_DIR, "desktop_1440_home_pdf_preview.png"), fullPage: false });
+
     // Mobile check for Catalogue Section
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto(`${BASE_URL}/`, { waitUntil: "networkidle" });
@@ -842,6 +862,7 @@ async function runTests() {
       await page.waitForTimeout(300);
       await page.screenshot({ path: path.join(OUTPUT_DIR, "mobile_390_catalogue_section.png"), fullPage: false });
     }
+    await page.screenshot({ path: path.join(OUTPUT_DIR, "mobile_390_home_pdf_preview.png"), fullPage: false });
 
     const allAboutContentMatches = Object.values(aboutPageAudit).every(Boolean);
     const passesTestJ =
@@ -851,7 +872,10 @@ async function runTests() {
       catalogueSectionAudit.hasEyebrow &&
       catalogueSectionAudit.hasHeading &&
       catalogueSectionAudit.hasDescription &&
-      catalogueSectionAudit.hasPlaceholder &&
+      !catalogueSectionAudit.hasPlaceholder &&
+      !catalogueSectionAudit.hasFileTargetText &&
+      catalogueSectionAudit.hasCoverImage &&
+      catalogueSectionAudit.hasBrochureBadge &&
       catalogueSectionAudit.viewHref === "/catalogue/advaita-tattva-catalogue.pdf" &&
       catalogueSectionAudit.viewTarget === "_blank" &&
       catalogueSectionAudit.downloadHref === "/catalogue/advaita-tattva-catalogue.pdf" &&
