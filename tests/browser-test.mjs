@@ -235,13 +235,15 @@ async function runTests() {
     );
     results.testD_category_separation.details.push(`Buddha category products (${buddhaProductTitles.length}): ${JSON.stringify(buddhaProductTitles)}`);
 
-    // Verify strict separation: must contain exactly 3 Buddha statues, and 0 Hindu deities
+    // Verify strict separation: must contain exactly 5 Buddha statues, and 0 Hindu deities
     const hasOnlyBuddhas =
-      buddhaProductTitles.length === 3 &&
+      buddhaProductTitles.length === 5 &&
       buddhaProductTitles.includes("Seated Buddha") &&
       buddhaProductTitles.includes("Buddha under Bodhi Tree") &&
+      buddhaProductTitles.includes("Buddha in Hand") &&
+      buddhaProductTitles.includes("Twin Seated Buddha Idols") &&
       buddhaProductTitles.includes("Lord Buddha") &&
-      !buddhaProductTitles.some((t) => t.includes("Ganesha") || t.includes("Durga") || t.includes("Lakshmi") || t.includes("Gopal") || t.includes("Shivling") || t.includes("Saraswati") || t.includes("Kubera"));
+      !buddhaProductTitles.some((t) => t.includes("Ganesha") || t.includes("Durga") || t.includes("Lakshmi") || t.includes("Gopal") || t.includes("Shivling") || t.includes("Saraswati") || t.includes("Kubera") || t.includes("Shiva") || t.includes("Rama") || t.includes("Nandi"));
 
     results.testD_category_separation.details.push(`Buddha strict purity test: ${hasOnlyBuddhas}`);
 
@@ -258,9 +260,9 @@ async function runTests() {
     );
     results.testD_category_separation.details.push(`Hindu category products (${hinduProductTitles.length}): ${JSON.stringify(hinduProductTitles)}`);
 
-    // Verify strict separation: must contain 7 Hindu idols and 0 Buddha statues
+    // Verify strict separation: must contain 19 Hindu idols and 0 Buddha statues
     const hasOnlyHindus =
-      hinduProductTitles.length === 7 &&
+      hinduProductTitles.length === 19 &&
       hinduProductTitles.includes("Lord Ganesha") &&
       hinduProductTitles.includes("Maa Durga") &&
       hinduProductTitles.includes("Maa Lakshmi") &&
@@ -268,6 +270,11 @@ async function runTests() {
       hinduProductTitles.includes("Shivling") &&
       hinduProductTitles.includes("Maa Saraswati") &&
       hinduProductTitles.includes("Lord Kubera") &&
+      hinduProductTitles.includes("Shiv Parivar") &&
+      hinduProductTitles.includes("Lord Krishna with Cow") &&
+      hinduProductTitles.includes("Lord Shiva") &&
+      hinduProductTitles.includes("Lord Rama") &&
+      hinduProductTitles.includes("Nandi Ji") &&
       !hinduProductTitles.some((t) => t.includes("Buddha"));
 
     results.testD_category_separation.details.push(`Hindu strict purity test: ${hasOnlyHindus}`);
@@ -283,9 +290,9 @@ async function runTests() {
     const allProductTitles = await page.$$eval("article h3", (elements) =>
       elements.map((el) => el.textContent.trim())
     );
-    results.testD_category_separation.details.push(`All Statues count: ${allProductTitles.length} (Expected 10)`);
+    results.testD_category_separation.details.push(`All Statues count: ${allProductTitles.length} (Expected 24)`);
 
-    if (hasOnlyBuddhas && hasOnlyHindus && allProductTitles.length === 10) {
+    if (hasOnlyBuddhas && hasOnlyHindus && allProductTitles.length === 24) {
       results.testD_category_separation.status = "PASS";
     } else {
       results.testD_category_separation.status = "FAIL";
@@ -387,7 +394,7 @@ async function runTests() {
         await mobileBuddhaOption.click();
         await page.waitForTimeout(400);
         const mobileBuddhaCards = await page.$$eval("article", (cards) => cards.length);
-        results.testF_mobile_and_responsive.details.push(`Mobile Buddha selection displays ${mobileBuddhaCards} cards (Expected 3)`);
+        results.testF_mobile_and_responsive.details.push(`Mobile Buddha selection displays ${mobileBuddhaCards} cards (Expected 5)`);
       }
     }
 
@@ -508,7 +515,7 @@ async function runTests() {
       `Product images verified: ${productImgs.length} rendered, ${failedImgs.length} failed to load.`
     );
 
-    // Verify all 10 products are represented in public/products/
+    // Verify all 24 products are represented in public/products/
     const expectedBrochureFiles = [
       "lord-ganesha.jpg",
       "maa-durga.jpg",
@@ -518,6 +525,20 @@ async function runTests() {
       "laddu-gopal.jpg",
       "shivling.jpg",
       "maa-saraswati.jpg",
+      "maa-lakshmi-seated.jpg",
+      "lord-hanuman.jpg",
+      "shiv-parivar.jpg",
+      "lakshmi-ganesha.jpg",
+      "lakshmi-ganesha-ornate.jpg",
+      "krishna-cow.jpg",
+      "buddha-in-hand.jpg",
+      "panchmukhi-hanuman.jpg",
+      "twin-buddha.jpg",
+      "standing-hanuman.jpg",
+      "lord-shiva.jpg",
+      "lord-rama.jpg",
+      "nandi-ji.jpg",
+      "tara-devi.jpg",
       "lord-kubera.jpg",
       "lord-buddha.jpg",
     ];
