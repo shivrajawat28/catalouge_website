@@ -36,16 +36,44 @@ export interface SiteConfig {
   cataloguePdfPath: string;
   products: ProductItem[];
   aboutContent: {
-    heading: string;
-    subheading: string;
-    leadParagraph: string;
-    craftPhilosophy: string;
-    foundryHeritage: string;
-    qualityCommitment: string;
-    pillars: Array<{
-      title: string;
-      description: string;
-    }>;
+    hero: {
+      eyebrow: string;
+      brandName: string;
+      tagline: string;
+    };
+    philosophy: {
+      heading: string;
+      paragraphs: string[];
+    };
+    nameMeaning: {
+      heading: string;
+      intro: string;
+      advaita: {
+        term: string;
+        concept: string;
+        description: string;
+      };
+      tattva: {
+        term: string;
+        concept: string;
+        description: string;
+      };
+      synthesis: string;
+      conclusion: string;
+    };
+    journey: {
+      heading: string;
+      paragraphs: string[];
+      lostWaxHighlight: string;
+    };
+    approach: {
+      heading: string;
+      paragraphs: string[];
+    };
+    closingCta: {
+      heading: string;
+      supportingText: string;
+    };
   };
 }
 
@@ -60,8 +88,8 @@ export const siteConfig: SiteConfig = {
   adminEmail: "advaitatattvaa@gmail.com",
   businessHours: "Monday to Saturday, 9:00 AM – 5:00 PM IST",
   
-  // PDF Catalogue Asset Path (The uploaded brochure)
-  cataloguePdfPath: "/catalogue.pdf",
+  // PDF Catalogue Asset Path (Configured location for official brochure PDF)
+  cataloguePdfPath: "/catalogue/advaita-tattva-catalogue.pdf",
 
   // Curated Products List — 100% Extracted from Official Brochure PDF
   products: [
@@ -291,29 +319,61 @@ export const siteConfig: SiteConfig = {
   ],
 
   aboutContent: {
-    heading: "ADVAITA TATTVA",
-    subheading: "Antique Brass Idol Collection — A timeless devotional accent for your home, puja space, or thoughtful gifting.",
-    leadParagraph: "ADVAITA TATTVA presents the official Antique Brass Idol Collection. Every idol is cast in solid brass with an authentic antique finish, offering a timeless devotional accent for your home, puja space, or thoughtful gifting.",
-    craftPhilosophy: "Each piece in the collection is crafted in solid antique brass with careful attention to traditional iconography. From compact 2-inch personal shrines to prominent 12-inch statement idols, each item features verifiable heights and weights as documented in our official catalogue.",
-    foundryHeritage: "Rooted in traditional brass metallurgy, each sculpture is hand-detailed to evoke serenity, balance, and sacred presence in residential sanctuaries and devotional spaces.",
-    qualityCommitment: "Standard catalogued sizes range from 2 inches to 12 inches with recorded weights from 60 grams to 787 grams. Looking for a different size? Custom sizes are available on request.",
-    pillars: [
-      {
-        title: "Official Catalogue Portfolio",
-        description: "Authentic Buddha and Hindu deity icons with certified heights and weights matching the original 7-page brochure."
+    hero: {
+      eyebrow: "ABOUT US",
+      brandName: "Advaita Tattva",
+      tagline: "Celebrating Indian Heritage Through Philosophy, Craftsmanship & Meaningful Design.",
+    },
+    philosophy: {
+      heading: "Our Philosophy",
+      paragraphs: [
+        "At Advaita Tattva, we believe that true artistry goes beyond what the eyes can see. It carries the depth of culture, the wisdom of tradition and the meaning behind every creation.",
+        "Inspired by the timeless philosophy of ancient India and the richness of its artistic heritage, Advaita Tattva is an Indian heritage and spiritual craftsmanship brand dedicated to bringing traditional artistry into the modern world.",
+        "Our vision is to create a meaningful connection between India's cultural roots and contemporary living — celebrating craftsmanship not merely as a skill, but as an expression of identity, devotion and timeless beauty.",
+        "We aspire to share the richness of Indian craftsmanship with the world, making its artistic and spiritual significance accessible to generations across cultures and boundaries.",
+      ],
+    },
+    nameMeaning: {
+      heading: "THE MEANING BEHIND OUR NAME",
+      intro: "The name Advaita Tattva was chosen with a purpose. We wanted an identity that carried a deeper meaning — one that reflected the spiritual philosophy of India and the material artistry behind our creations.",
+      advaita: {
+        term: "ADVAITA",
+        concept: "Ancient Indian philosophical concept meaning \"not two\" or \"one without a second.\"",
+        description: "Advaita is an ancient Indian philosophical concept meaning \"not two\" or \"one without a second.\" It represents the understanding that beneath the diversity of existence lies one unified reality. In Indian spiritual traditions, this philosophy also inspires the understanding of the divine as one, expressed through many forms and manifestations.",
       },
-      {
-        title: "Solid Antique Brass",
-        description: "Cast in heavy solid brass with rich, hand-detailed antique patina that deepens gracefully over time."
+      tattva: {
+        term: "TATTVA",
+        concept: "A Sanskrit word associated with essence, fundamental principles and the underlying nature of things.",
+        description: "Tattva is a Sanskrit word associated with essence, fundamental principles and the underlying nature of things. It reflects our appreciation for the material, artistic and creative elements that come together in traditional craftsmanship.",
       },
-      {
-        title: "Custom Sizes on Request",
-        description: "Standard catalogue heights from 2 to 12 inches, with custom bespoke proportions available on request."
-      },
-      {
-        title: "Direct WhatsApp Service",
-        description: "Personal assistance and enquiry support with prefilled product codes and brochure page references."
-      }
-    ]
+      synthesis: "Together, the two words represent a connection between spiritual thought and physical creation — between the eternal wisdom of India and the artistry through which its cultural expressions take form.",
+      conclusion: "For us, Advaita Tattva is more than a name. It is the philosophy that inspires our identity and the meaning behind our journey.",
+    },
+    journey: {
+      heading: "OUR JOURNEY: ROOTED IN INDIAN CRAFTSMANSHIP",
+      paragraphs: [
+        "Our journey began with an existing foundation in brass idol manufacturing and trading, built around an appreciation for the skill and dedication involved in traditional Indian metal craftsmanship.",
+        "Over time, we wanted to take this journey further. We envisioned building a distinct brand identity, strengthening our presence in the digital world and introducing the beauty of Indian spiritual art and craftsmanship to a wider audience.",
+        "This vision gave rise to Advaita Tattva.",
+        "An important part of our manufacturing journey has been the adoption of the traditional lost-wax casting technique. Compared with conventional handmade casting methods, which can require considerable time and skilled labour, this technique offers opportunities for refined finishing, intricate detailing and comparatively lighter creations.",
+        "We see craftsmanship as more than the process of making something. It is the expression of generations of artistic knowledge, patience and creativity.",
+        "Our motivation is to give this richness of Indian craftsmanship greater recognition and a meaningful place in the modern global landscape.",
+      ],
+      lostWaxHighlight: "An important part of our manufacturing journey has been the adoption of the traditional lost-wax casting technique. Compared with conventional handmade casting methods, which can require considerable time and skilled labour, this technique offers opportunities for refined finishing, intricate detailing and comparatively lighter creations.",
+    },
+    approach: {
+      heading: "OUR APPROACH: TRADITION MEETS MODERN LIVING",
+      paragraphs: [
+        "We believe that heritage should not remain confined to the past. It deserves to evolve, find new expressions and become part of contemporary life.",
+        "At Advaita Tattva, we celebrate traditional Indian artistic forms while embracing the possibilities of modern manufacturing and design.",
+        "Our creations are inspired by India's spiritual and cultural heritage, bringing together traditional aesthetics, detailed craftsmanship and a sense of timeless elegance.",
+        "We believe that meaningful design is not simply about appearance. It is about creating something that carries a story, reflects cultural identity and holds lasting significance for the people who experience it.",
+        "Through our work, we aim to make Indian spiritual art a meaningful part of modern homes, personal spaces and everyday living.",
+      ],
+    },
+    closingCta: {
+      heading: "Discover the Art of Indian Heritage",
+      supportingText: "Explore our collection of handcrafted brass sculptures and discover the meaning behind every creation.",
+    },
   }
 };

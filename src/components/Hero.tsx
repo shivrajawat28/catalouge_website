@@ -53,7 +53,7 @@ export function Hero() {
 
                   <a
                     href={siteConfig.cataloguePdfPath}
-                    download="Advaita-Tattva-Brass-Brochure.pdf"
+                    download="Advaita-Tattva-Catalogue.pdf"
                     className="p-3.5 hover:text-[#C5A059] transition-colors"
                     title="Download PDF to device"
                     aria-label="Download PDF Catalogue"

@@ -198,7 +198,7 @@ export function Header() {
               {/* Direct Download Icon Button */}
               <a
                 href={siteConfig.cataloguePdfPath}
-                download="Advaita-Tattva-Brass-Brochure.pdf"
+                download="Advaita-Tattva-Catalogue.pdf"
                 className="ml-1 p-2 rounded-full border border-[#D8CCBD] bg-white text-[#44403C] hover:text-[#B38A38] hover:border-[#B38A38] transition-all shadow-xs"
                 title="Direct Download PDF Catalogue"
                 aria-label="Download PDF Catalogue"
@@ -350,7 +350,7 @@ export function Header() {
 
                 <a
                   href={siteConfig.cataloguePdfPath}
-                  download="Advaita-Tattva-Brass-Brochure.pdf"
+                  download="Advaita-Tattva-Catalogue.pdf"
                   className="inline-flex items-center justify-center p-3 rounded-xl border border-[#D8CCBD] bg-white text-[#1C1917]"
                   title="Download PDF"
                   aria-label="Download PDF Catalogue"

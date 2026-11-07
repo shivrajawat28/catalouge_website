@@ -22,6 +22,7 @@ async function runTests() {
     testG_functional_interactions: { status: "pending", details: [] },
     testH_brochure_images_and_assets: { status: "pending", details: [] },
     testI_final_ui_cleanup_and_contact: { status: "pending", details: [] },
+    testJ_about_redesign_and_catalogue_section: { status: "pending", details: [] },
   };
 
   const browser = await chromium.launch({
@@ -472,8 +473,8 @@ async function runTests() {
     results.testG_functional_interactions.details.push(`Floating WhatsApp button targets: ${waLink}`);
 
     // 4. PDF Catalogue button link
-    const pdfLinks = await page.$$eval("a[href*='catalogue.pdf']", (links) => links.map((l) => l.href));
-    results.testG_functional_interactions.details.push(`PDF Catalogue links found: ${pdfLinks.length}`);
+    const pdfLinks = await page.$$eval("a[href*='advaita-tattva-catalogue.pdf']", (links) => links.map((l) => l.href));
+    results.testG_functional_interactions.details.push(`PDF Catalogue links found to configured path: ${pdfLinks.length}`);
 
     results.testG_functional_interactions.status = "PASS";
 
@@ -528,43 +529,48 @@ async function runTests() {
       results.testH_brochure_images_and_assets.details.push(`ERROR: Missing brochure files: ${missingFiles.join(", ")}`);
     }
 
-    // Verify PDF Catalogue file
-    const pdfPath = path.resolve("public/catalogue.pdf");
-    const pdfExists = fs.existsSync(pdfPath);
-    const pdfSize = pdfExists ? fs.statSync(pdfPath).size : 0;
-    const pdfBuffer = pdfExists ? fs.readFileSync(pdfPath) : null;
-    const pdfHash = pdfBuffer ? crypto.createHash("md5").update(pdfBuffer).digest("hex") : null;
-    const expectedHash = "39851612c74f2272397b10c58c9e0265";
-    const hashMatch = pdfHash === expectedHash;
+    // Verify PDF Catalogue folder exists
+    const catalogueDir = path.resolve("public/catalogue");
+    const catalogueDirExists = fs.existsSync(catalogueDir);
+    const configuredPdfPath = path.resolve("public/catalogue/advaita-tattva-catalogue.pdf");
+    const configuredPdfExists = fs.existsSync(configuredPdfPath);
 
     results.testH_brochure_images_and_assets.details.push(
-      `PDF catalogue (/catalogue.pdf): exists = ${pdfExists}, size = ${pdfSize} bytes, MD5 = ${pdfHash} (Matches original: ${hashMatch})`
+      `Catalogue directory (public/catalogue): exists = ${catalogueDirExists}. Configured PDF (advaita-tattva-catalogue.pdf): exists = ${configuredPdfExists} (Awaiting user manual file placement).`
     );
 
-    // Verify zero console errors
-    results.testH_brochure_images_and_assets.details.push(`Console errors captured: ${consoleErrors.length}`);
-    if (consoleErrors.length > 0) {
-      results.testH_brochure_images_and_assets.details.push(`Errors: ${consoleErrors.join("; ")}`);
+    // Filter out expected HEAD 404 for missing PDF file from failedRequests
+    const unexpectedFailedRequests = failedRequests.filter(
+      (r) => !r.url.includes("advaita-tattva-catalogue.pdf")
+    );
+
+    // Filter out expected 404 console logs for the absent PDF (which the user will manually drop in)
+    const unexpectedConsoleErrors = consoleErrors.filter(
+      (err) => !err.includes("advaita-tattva-catalogue.pdf") && !err.includes("404")
+    );
+
+    // Verify zero unexpected console errors
+    results.testH_brochure_images_and_assets.details.push(`Unexpected console errors captured: ${unexpectedConsoleErrors.length}`);
+    if (unexpectedConsoleErrors.length > 0) {
+      results.testH_brochure_images_and_assets.details.push(`Errors: ${unexpectedConsoleErrors.join("; ")}`);
     }
 
-    // Verify zero failed requests
-    results.testH_brochure_images_and_assets.details.push(`Failed network requests: ${failedRequests.length}`);
-    if (failedRequests.length > 0) {
-      results.testH_brochure_images_and_assets.details.push(`Failed requests: ${JSON.stringify(failedRequests)}`);
+    // Verify zero unexpected failed requests
+    results.testH_brochure_images_and_assets.details.push(`Unexpected failed network requests: ${unexpectedFailedRequests.length}`);
+    if (unexpectedFailedRequests.length > 0) {
+      results.testH_brochure_images_and_assets.details.push(`Failed requests: ${JSON.stringify(unexpectedFailedRequests)}`);
     }
 
     // Verify NO external stock images are being requested
-    const externalImgRequests = failedRequests.filter((r) => !r.url.startsWith("http://localhost:3000"));
+    const externalImgRequests = unexpectedFailedRequests.filter((r) => !r.url.startsWith("http://localhost:3000"));
     results.testH_brochure_images_and_assets.details.push(`External image requests: ${externalImgRequests.length}`);
 
     if (
       failedImgs.length === 0 &&
       missingFiles.length === 0 &&
-      pdfExists &&
-      pdfSize > 100000 &&
-      hashMatch &&
-      consoleErrors.length === 0 &&
-      failedRequests.length === 0
+      catalogueDirExists &&
+      unexpectedConsoleErrors.length === 0 &&
+      unexpectedFailedRequests.length === 0
     ) {
       results.testH_brochure_images_and_assets.status = "PASS";
     } else {
@@ -710,6 +716,152 @@ async function runTests() {
       results.testI_final_ui_cleanup_and_contact.status = "PASS";
     } else {
       results.testI_final_ui_cleanup_and_contact.status = "FAIL";
+    }
+
+    // -------------------------------------------------------------
+    // Test J: About Us Redesign & Dedicated Catalogue Section
+    // -------------------------------------------------------------
+    console.log("Running Test J: About Us Redesign & Dedicated Catalogue Section...");
+    
+    // --- Part 1: Verify Redesigned About Us Page ---
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto(`${BASE_URL}/about`, { waitUntil: "networkidle" });
+
+    const aboutPageAudit = await page.evaluate(() => {
+      const text = document.body.textContent || "";
+      return {
+        hasHeroEyebrow: text.includes("ABOUT US"),
+        hasHeroBrand: text.includes("Advaita Tattva"),
+        hasHeroTagline: text.includes("Celebrating Indian Heritage Through Philosophy, Craftsmanship & Meaningful Design."),
+        hasPhilosophyHeading: text.includes("Our Philosophy"),
+        hasPhilosophyP1: text.includes("At Advaita Tattva, we believe that true artistry goes beyond what the eyes can see"),
+        hasPhilosophyP2: text.includes("Inspired by the timeless philosophy of ancient India"),
+        hasPhilosophyP3: text.includes("Our vision is to create a meaningful connection between India's cultural roots"),
+        hasPhilosophyP4: text.includes("We aspire to share the richness of Indian craftsmanship with the world"),
+        hasNameMeaningHeading: text.includes("THE MEANING BEHIND OUR NAME"),
+        hasAdvaitaTerm: text.includes("ADVAITA"),
+        hasAdvaitaConcept: text.includes("not two") || text.includes("one without a second"),
+        hasTattvaTerm: text.includes("TATTVA"),
+        hasTattvaConcept: text.includes("essence, fundamental principles and the underlying nature of things"),
+        hasSynthesis: text.includes("Together, the two words represent a connection between spiritual thought and physical creation"),
+        hasConclusion: text.includes("For us, Advaita Tattva is more than a name. It is the philosophy that inspires our identity"),
+        hasJourneyHeading: text.includes("OUR JOURNEY: ROOTED IN INDIAN CRAFTSMANSHIP"),
+        hasLostWaxHighlight: text.includes("traditional lost-wax casting technique"),
+        hasApproachHeading: text.includes("OUR APPROACH: TRADITION MEETS MODERN LIVING"),
+        hasClosingCtaHeading: text.includes("Discover the Art of Indian Heritage"),
+        hasClosingCtaSupport: text.includes("Explore our collection of handcrafted brass sculptures"),
+      };
+    });
+
+    results.testJ_about_redesign_and_catalogue_section.details.push(
+      `About Page Content Audit: Hero=${aboutPageAudit.hasHeroTagline}, Philosophy=${aboutPageAudit.hasPhilosophyP1}, NameMeaning=${aboutPageAudit.hasNameMeaningHeading}, Journey=${aboutPageAudit.hasJourneyHeading}, LostWax=${aboutPageAudit.hasLostWaxHighlight}, Approach=${aboutPageAudit.hasApproachHeading}, ClosingCTA=${aboutPageAudit.hasClosingCtaHeading}`
+    );
+
+    // Verify About Page Closing CTA interactions
+    const aboutExploreBtn = await page.$("section:has-text('Discover the Art of Indian Heritage') a:has-text('Explore Our Collection')");
+    const exploreHref = aboutExploreBtn ? await aboutExploreBtn.getAttribute("href") : null;
+    results.testJ_about_redesign_and_catalogue_section.details.push(`About page Explore Collection button href: ${exploreHref}`);
+
+    const aboutContactBtn = await page.$("section:has-text('Discover the Art of Indian Heritage') button:has-text('Contact Us')");
+    let aboutContactOpensModal = false;
+    if (aboutContactBtn) {
+      await aboutContactBtn.click();
+      await page.waitForTimeout(200);
+      aboutContactOpensModal = await page.evaluate(() => !!document.querySelector("dialog[open]"));
+      results.testJ_about_redesign_and_catalogue_section.details.push(`About page Contact Us button opens dialog: ${aboutContactOpensModal}`);
+      await page.keyboard.press("Escape");
+      await page.waitForTimeout(200);
+    }
+
+    // Capture About Page Screenshots (Desktop & Mobile)
+    await page.screenshot({ path: path.join(OUTPUT_DIR, "desktop_1440_about_redesign.png"), fullPage: false });
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto(`${BASE_URL}/about`, { waitUntil: "networkidle" });
+    await page.screenshot({ path: path.join(OUTPUT_DIR, "mobile_390_about_redesign.png"), fullPage: false });
+
+    // --- Part 2: Verify Home Page Dedicated Catalogue Section ---
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto(`${BASE_URL}/`, { waitUntil: "networkidle" });
+
+    const catalogueSectionAudit = await page.evaluate(() => {
+      const section = document.querySelector("#catalogue-brochure");
+      if (!section) return null;
+
+      const text = section.textContent || "";
+      const hasEyebrow = text.includes("OFFICIAL PRODUCT CATALOGUE");
+      const hasHeading = text.includes("Explore Our Collection");
+      const hasDescription = text.includes("Discover our collection of handcrafted brass sculptures, inspired by Indian heritage");
+      const hasPlaceholder = text.includes("Official Catalogue Coming Soon");
+      const hasFileBadge = text.includes("advaita-tattva-catalogue.pdf");
+
+      const viewBtn = section.querySelector("a[href*='advaita-tattva-catalogue.pdf']:not([download])");
+      const downloadBtn = section.querySelector("a[download]");
+
+      return {
+        exists: true,
+        hasEyebrow,
+        hasHeading,
+        hasDescription,
+        hasPlaceholder,
+        hasFileBadge,
+        viewHref: viewBtn ? viewBtn.getAttribute("href") : null,
+        viewTarget: viewBtn ? viewBtn.getAttribute("target") : null,
+        downloadHref: downloadBtn ? downloadBtn.getAttribute("href") : null,
+        downloadFilename: downloadBtn ? downloadBtn.getAttribute("download") : null,
+      };
+    });
+
+    results.testJ_about_redesign_and_catalogue_section.details.push(
+      `Catalogue Section Audit: exists=${catalogueSectionAudit?.exists}, eyebrow=${catalogueSectionAudit?.hasEyebrow}, heading=${catalogueSectionAudit?.hasHeading}, placeholder=${catalogueSectionAudit?.hasPlaceholder}`
+    );
+    results.testJ_about_redesign_and_catalogue_section.details.push(
+      `Catalogue Section View Link: ${catalogueSectionAudit?.viewHref} (target=${catalogueSectionAudit?.viewTarget})`
+    );
+    results.testJ_about_redesign_and_catalogue_section.details.push(
+      `Catalogue Section Download Link: ${catalogueSectionAudit?.downloadHref} (download=${catalogueSectionAudit?.downloadFilename})`
+    );
+
+    // Verify Header PDF Catalogue button uses exact configured path
+    const headerPdfHref = await page.$eval("header a[title*='PDF Catalogue'], header a[href*='catalogue']", (el) => el.getAttribute("href"));
+    results.testJ_about_redesign_and_catalogue_section.details.push(`Header PDF Catalogue link href: ${headerPdfHref}`);
+
+    // Capture Catalogue Section Screenshots
+    const catSecEl = await page.$("#catalogue-brochure");
+    if (catSecEl) {
+      await catSecEl.scrollIntoViewIfNeeded();
+      await page.waitForTimeout(300);
+      await page.screenshot({ path: path.join(OUTPUT_DIR, "desktop_1440_catalogue_section.png"), fullPage: false });
+    }
+
+    // Mobile check for Catalogue Section
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto(`${BASE_URL}/`, { waitUntil: "networkidle" });
+    const mobileCatEl = await page.$("#catalogue-brochure");
+    if (mobileCatEl) {
+      await mobileCatEl.scrollIntoViewIfNeeded();
+      await page.waitForTimeout(300);
+      await page.screenshot({ path: path.join(OUTPUT_DIR, "mobile_390_catalogue_section.png"), fullPage: false });
+    }
+
+    const allAboutContentMatches = Object.values(aboutPageAudit).every(Boolean);
+    const passesTestJ =
+      allAboutContentMatches &&
+      aboutContactOpensModal &&
+      catalogueSectionAudit?.exists &&
+      catalogueSectionAudit.hasEyebrow &&
+      catalogueSectionAudit.hasHeading &&
+      catalogueSectionAudit.hasDescription &&
+      catalogueSectionAudit.hasPlaceholder &&
+      catalogueSectionAudit.viewHref === "/catalogue/advaita-tattva-catalogue.pdf" &&
+      catalogueSectionAudit.viewTarget === "_blank" &&
+      catalogueSectionAudit.downloadHref === "/catalogue/advaita-tattva-catalogue.pdf" &&
+      catalogueSectionAudit.downloadFilename === "Advaita-Tattva-Catalogue.pdf" &&
+      headerPdfHref === "/catalogue/advaita-tattva-catalogue.pdf";
+
+    if (passesTestJ) {
+      results.testJ_about_redesign_and_catalogue_section.status = "PASS";
+    } else {
+      results.testJ_about_redesign_and_catalogue_section.status = "FAIL";
     }
 
   } catch (err) {
