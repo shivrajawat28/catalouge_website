@@ -36,6 +36,74 @@
   animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
+/* Ambient Hero Brass Halo & Drift Animations */
+@keyframes ambientPulse {
+  0%, 100% {
+    transform: scale(0.96);
+    opacity: 0.78;
+  }
+  50% {
+    transform: scale(1.04);
+    opacity: 0.98;
+  }
+}
+
+@keyframes floatDriftSlow {
+  0%, 100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  50% {
+    transform: translate(8px, -12px) scale(1.02);
+  }
+}
+
+@keyframes floatDriftReverse {
+  0%, 100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  50% {
+    transform: translate(-8px, 10px) scale(1.02);
+  }
+}
+
+@keyframes slowSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes slowReverseSpin {
+  from {
+    transform: rotate(360deg);
+  }
+  to {
+    transform: rotate(0deg);
+  }
+}
+
+.animate-ambient-pulse {
+  animation: ambientPulse 18s ease-in-out infinite;
+}
+
+.animate-float-drift {
+  animation: floatDriftSlow 22s ease-in-out infinite;
+}
+
+.animate-float-drift-reverse {
+  animation: floatDriftReverse 24s ease-in-out infinite;
+}
+
+.animate-spin-ultra-slow {
+  animation: slowSpin 60s linear infinite;
+}
+
+.animate-reverse-spin-slow {
+  animation: slowReverseSpin 75s linear infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   ::before,
@@ -44,6 +112,14 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+  .animate-ambient-pulse,
+  .animate-float-drift,
+  .animate-float-drift-reverse,
+  .animate-spin-ultra-slow,
+  .animate-reverse-spin-slow {
+    animation: none !important;
+    transform: none !important;
   }
 }
 

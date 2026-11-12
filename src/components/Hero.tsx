@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
+import Image from "next/image";
 import { siteConfig } from "@/config/siteConfig";
 import { ContactModal } from "./ContactModal";
 import { FileText, FileDown, ArrowUpRight, Sparkles, Play } from "lucide-react";
@@ -140,11 +141,52 @@ export function Hero() {
               </div>
             </div>
 
-            {/* Right Column: Vertical 9:16 Smartphone-Sized Video Showcase (5 cols on lg) */}
-            <div className="lg:col-span-5 flex justify-center lg:justify-end">
+            {/* Right Column: Vertical 9:16 Smartphone-Sized Video Showcase with Ambient Brass Atmosphere (5 cols on lg) */}
+            <div className="lg:col-span-5 relative flex items-center justify-center lg:justify-end py-2 sm:py-4">
+              {/* Premium Ambient Antique Brass Aura & Blurred Silhouettes (Behind Video) */}
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-0 -m-8 sm:-m-12 flex items-center justify-center overflow-visible select-none z-0"
+              >
+                {/* 1. Warm Golden Light Gradient Halo (Diffuse Radial Aura) */}
+                <div className="absolute w-[340px] sm:w-[440px] md:w-[480px] lg:w-[520px] aspect-square rounded-full bg-[radial-gradient(circle_at_center,rgba(212,178,111,0.28)_0%,rgba(244,235,215,0.48)_38%,rgba(250,248,245,0)_72%)] blur-2xl sm:blur-3xl animate-ambient-pulse" />
+
+                {/* 2. Concentric Antique Brass Prabhavali Rings (Temple Halo Motifs) */}
+                <div className="absolute w-[290px] sm:w-[360px] md:w-[390px] lg:w-[420px] aspect-square rounded-full border border-[#B38A38]/20 animate-spin-ultra-slow" />
+                <div className="absolute w-[330px] sm:w-[410px] md:w-[440px] lg:w-[480px] aspect-square rounded-full border border-dashed border-[#C5A059]/15 animate-reverse-spin-slow" />
+
+                {/* 3. Subtle Antique Brass Sculpture Silhouette 1 (Top-Left Shoulder: Buddha under Bodhi Tree Canopy) */}
+                <div className="absolute -top-4 -left-4 sm:-top-8 sm:-left-8 w-40 sm:w-52 aspect-square opacity-20 sm:opacity-22 blur-2xl animate-float-drift">
+                  <Image
+                    src="/products/buddha-bodhi-tree.jpg"
+                    alt=""
+                    width={220}
+                    height={220}
+                    sizes="(max-width: 640px) 160px, 220px"
+                    className="w-full h-full object-contain filter sepia-[0.35] contrast-105 pointer-events-none"
+                  />
+                </div>
+
+                {/* 4. Subtle Antique Brass Sculpture Silhouette 2 (Bottom-Right Shoulder: Lord Ganesha Ornate Arch) */}
+                <div className="absolute -bottom-4 -right-4 sm:-bottom-8 sm:-right-8 w-40 sm:w-52 aspect-square opacity-18 sm:opacity-20 blur-2xl animate-float-drift-reverse">
+                  <Image
+                    src="/products/lord-ganesha.jpg"
+                    alt=""
+                    width={220}
+                    height={220}
+                    sizes="(max-width: 640px) 160px, 220px"
+                    className="w-full h-full object-contain filter sepia-[0.35] contrast-105 pointer-events-none"
+                  />
+                </div>
+
+                {/* 5. Center Soft Brass Reflection Behind Phone Glass */}
+                <div className="absolute w-[180px] sm:w-[220px] aspect-square rounded-full bg-[#B38A38]/12 blur-xl" />
+              </div>
+
+              {/* Existing Vertical Smartphone-Sized Video Frame (Focal Point) */}
               <div
                 id="hero-video-frame"
-                className="relative w-[220px] sm:w-[245px] md:w-[255px] lg:w-[275px] xl:w-[290px] aspect-[9/16] rounded-[2rem] p-1.5 bg-[#1C1917] ring-1 ring-[#B38A38]/35 shadow-md"
+                className="relative z-10 w-[220px] sm:w-[245px] md:w-[255px] lg:w-[275px] xl:w-[290px] aspect-[9/16] rounded-[2rem] p-1.5 bg-[#1C1917] ring-1 ring-[#B38A38]/40 shadow-[0_20px_50px_-10px_rgba(28,25,23,0.22),0_0_40px_rgba(212,178,111,0.2)] transition-shadow duration-500"
               >
                 <div className="relative w-full h-full rounded-[1.625rem] overflow-hidden bg-[#1C1917]">
                   <video
