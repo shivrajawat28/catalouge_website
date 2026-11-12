@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { siteConfig } from "@/config/siteConfig";
 import { WhatsAppIcon } from "./Icons";
@@ -20,14 +21,23 @@ export function Footer() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
           {/* Brand Info */}
           <div className="space-y-2">
-            <Link href="/" className="inline-block">
-              <span className="font-serif text-xl font-bold tracking-[0.16em] uppercase text-[#1C1917] hover:text-[#B38A38] transition-colors">
-                {siteConfig.companyName}
-              </span>
+            <Link href="/" className="inline-flex items-center gap-3 group">
+              <Image
+                src="/brand/advaita-tattva-logo.jpg"
+                alt="Advaita Tattva Official Logo"
+                width={52}
+                height={52}
+                className="h-12 w-12 sm:h-13 sm:w-13 object-contain rounded-xl border border-[#E7E0D4] shadow-2xs shrink-0"
+              />
+              <div>
+                <span className="block font-serif text-xl font-bold tracking-[0.16em] uppercase text-[#1C1917] group-hover:text-[#B38A38] transition-colors">
+                  {siteConfig.companyName}
+                </span>
+                <p className="text-xs text-[#44403C] max-w-sm mt-0.5">
+                  {siteConfig.tagline}
+                </p>
+              </div>
             </Link>
-            <p className="text-xs text-[#44403C] max-w-sm">
-              {siteConfig.tagline}
-            </p>
           </div>
 
           {/* Quick Links */}

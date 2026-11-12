@@ -1,16 +1,27 @@
-import { chromium } from "playwright";
+import { chromium, firefox, webkit } from "playwright";
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 
 const BASE_URL = process.env.BASE_URL || "http://localhost:3000";
-const OUTPUT_DIR = path.resolve("public/test-artifacts");
+const PW_BROWSER = (process.env.PW_BROWSER || "chromium").toLowerCase();
+const OUTPUT_DIR = path.resolve("tests/artifacts");
 
 if (!fs.existsSync(OUTPUT_DIR)) {
   fs.mkdirSync(OUTPUT_DIR, { recursive: true });
 }
 
+function findCachedBrowser(prefix, relativeBin) {
+  const cacheDir = path.join(os.homedir(), "Library/Caches/ms-playwright");
+  if (!fs.existsSync(cacheDir)) return undefined;
+  const match = fs.readdirSync(cacheDir).find((d) => d.startsWith(prefix));
+  if (!match) return undefined;
+  const candidate = path.join(cacheDir, match, relativeBin);
+  return fs.existsSync(candidate) ? candidate : undefined;
+}
+
 async function runTests() {
-  console.log(`Starting automated browser test suite against ${BASE_URL}...`);
+  console.log(`Starting automated browser test suite [${PW_BROWSER}] against ${BASE_URL}...`);
   const results = {
     testA_startup: { status: "pending", details: [] },
     testB_css_and_rendering: { status: "pending", details: [] },
@@ -22,12 +33,26 @@ async function runTests() {
     testH_brochure_images_and_assets: { status: "pending", details: [] },
     testI_final_ui_cleanup_and_contact: { status: "pending", details: [] },
     testJ_about_redesign_and_catalogue_section: { status: "pending", details: [] },
+    testK_hero_vertical_video: { status: "pending", details: [] },
+    testL_video_gallery_section: { status: "pending", details: [] },
+    testM_logo_and_favicon: { status: "pending", details: [] },
+    testN_security_and_accessibility: { status: "pending", details: [] },
   };
 
-  const browser = await chromium.launch({
-    headless: true,
-    executablePath: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
-  });
+  let browser;
+  if (PW_BROWSER === "firefox") {
+    const ffBin = findCachedBrowser("firefox-", "firefox/Nightly.app/Contents/MacOS/firefox");
+    browser = await firefox.launch({ headless: true, ...(ffBin ? { executablePath: ffBin } : {}) });
+  } else if (PW_BROWSER === "webkit") {
+    const wkBin = findCachedBrowser("webkit-", "pw_run.sh");
+    browser = await webkit.launch({ headless: true, ...(wkBin ? { executablePath: wkBin } : {}) });
+  } else {
+    const chromePath = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
+    browser = await chromium.launch({
+      headless: true,
+      ...(fs.existsSync(chromePath) ? { executablePath: chromePath } : {}),
+    });
+  }
 
   const consoleErrors = [];
   const failedRequests = [];
@@ -46,10 +71,21 @@ async function runTests() {
 
   page.on("requestfailed", (request) => {
     const url = request.url();
+    const errorText = request.failure()?.errorText || "unknown";
     if (url.startsWith("chrome-extension://")) return;
+    // Ignore normal HTTP byte-range / cancellation aborts triggered by <video> pipeline or route transitions
+    if (
+      request.resourceType() === "media" &&
+      (errorText === "net::ERR_ABORTED" ||
+        errorText.toLowerCase().includes("abort") ||
+        errorText.toLowerCase().includes("cancel") ||
+        errorText.includes("NS_BINDING_ABORTED"))
+    ) {
+      return;
+    }
     failedRequests.push({
       url: url,
-      failure: request.failure()?.errorText || "unknown",
+      failure: errorText,
     });
   });
 
@@ -66,7 +102,11 @@ async function runTests() {
     const aboutStatus = aboutRes.status();
     results.testA_startup.details.push(`About page status: ${aboutStatus}`);
 
-    if (homeStatus === 200 && aboutStatus === 200) {
+    const productsRes = await page.goto(`${BASE_URL}/products`, { waitUntil: "networkidle" });
+    const productsStatus = productsRes.status();
+    results.testA_startup.details.push(`Products page status: ${productsStatus}`);
+
+    if (homeStatus === 200 && aboutStatus === 200 && productsStatus === 200) {
       results.testA_startup.status = "PASS";
     } else {
       results.testA_startup.status = "FAIL";
@@ -215,14 +255,58 @@ async function runTests() {
     }
 
     // -------------------------------------------------------------
-    // Test D: Category Filtering & Strict Separation
+    // Test D: Homepage Featured 5 + /products Category Filtering & Separation
     // -------------------------------------------------------------
-    console.log("Running Test D: Category Filtering & Strict Separation...");
-    // 1. Select Buddha Statues via three-dot menu
-    await threeDotBtn.click();
+    console.log("Running Test D: Homepage Featured Showcase & /products Category Separation...");
+    await page.goto(`${BASE_URL}/`, { waitUntil: "networkidle" });
+
+    // 0a. Verify Homepage displays 5 featured products balanced across Buddha & Hindu + CTA
+    const homeShowcaseAudit = await page.evaluate(() => {
+      const cards = Array.from(document.querySelectorAll("#catalogue article"));
+      const categories = cards.map((card) =>
+        Array.from(card.querySelectorAll("span")).find(
+          (s) => s.textContent.trim() === "Buddha Statues" || s.textContent.trim() === "Hindu Statues"
+        )?.textContent.trim()
+      );
+      const cta = document.querySelector("#complete-collection-cta");
+      const ctaHeading = cta?.querySelector("h3")?.textContent?.trim();
+      const ctaText = cta?.querySelector("p")?.textContent?.trim();
+      const ctaLink = cta?.querySelector("a[href='/products']");
+      return {
+        cardCount: cards.length,
+        buddhaCount: categories.filter((c) => c === "Buddha Statues").length,
+        hinduCount: categories.filter((c) => c === "Hindu Statues").length,
+        ctaHeading,
+        ctaText,
+        ctaBtnText: ctaLink?.textContent?.trim(),
+        ctaHref: ctaLink?.getAttribute("href"),
+      };
+    });
+    results.testD_category_separation.details.push(`Homepage Featured Audit: ${JSON.stringify(homeShowcaseAudit)}`);
+    const homeCtaEl = await page.$("#complete-collection-cta");
+    if (homeCtaEl) await homeCtaEl.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(300);
+    await page.screenshot({ path: path.join(OUTPUT_DIR, "desktop_1440_home_featured.png"), fullPage: false });
+
+    const homeFeaturedValid =
+      homeShowcaseAudit.cardCount === 5 &&
+      homeShowcaseAudit.buddhaCount >= 1 &&
+      homeShowcaseAudit.hinduCount >= 1 &&
+      homeShowcaseAudit.ctaHeading === "Explore Our Complete Collection" &&
+      homeShowcaseAudit.ctaText === "Discover our complete collection of handcrafted antique brass idols." &&
+      homeShowcaseAudit.ctaBtnText === "View All Products" &&
+      homeShowcaseAudit.ctaHref === "/products";
+
+    // 1. Select Buddha Statues via three-dot menu -> navigates to /products?category=buddha
+    const threeDotMenuBtn = await page.$("header nav button[aria-label='Statue Categories Menu']");
+    await threeDotMenuBtn.click();
     await page.waitForTimeout(250);
     const buddhaMenuItem = await page.$("header nav div[role='menu'] button:has-text('Buddha Statues')");
-    await buddhaMenuItem.click();
+    await Promise.all([
+      page.waitForURL("**/products?category=buddha"),
+      buddhaMenuItem.click(),
+    ]);
+    await page.waitForLoadState("networkidle");
     await page.waitForTimeout(400);
 
     // Verify URL updated
@@ -250,8 +334,8 @@ async function runTests() {
     // Capture screenshot of Buddha category showcase
     await page.screenshot({ path: path.join(OUTPUT_DIR, "desktop_1440_buddha_category.png"), fullPage: false });
 
-    // 2. Select Hindu Statues via Category Tab
-    const hinduTab = await page.$("button:has-text('Hindu Statues')");
+    // 2. Select Hindu Statues via Category Tab on /products
+    const hinduTab = await page.$("#catalogue button:has-text('Hindu Statues')");
     await hinduTab.click();
     await page.waitForTimeout(400);
 
@@ -282,17 +366,28 @@ async function runTests() {
     // Capture screenshot of Hindu category showcase
     await page.screenshot({ path: path.join(OUTPUT_DIR, "desktop_1440_hindu_category.png"), fullPage: false });
 
-    // 3. Select All Statues
-    const allTab = await page.$("button:has-text('All Statues')");
+    // 3. Select All Products on /products and check page heading/subtitle
+    const allTab = await page.$("#catalogue button:has-text('All Products')");
     await allTab.click();
     await page.waitForTimeout(400);
 
+    const productsHeaderAudit = await page.evaluate(() => ({
+      heading: document.querySelector("#catalogue-heading")?.textContent?.trim(),
+      subtitle: document.querySelector("#catalogue p")?.textContent?.trim(),
+    }));
     const allProductTitles = await page.$$eval("article h3", (elements) =>
       elements.map((el) => el.textContent.trim())
     );
-    results.testD_category_separation.details.push(`All Statues count: ${allProductTitles.length} (Expected 24)`);
+    results.testD_category_separation.details.push(`All Products count: ${allProductTitles.length} (Expected 24), header: ${JSON.stringify(productsHeaderAudit)}`);
+    await page.screenshot({ path: path.join(OUTPUT_DIR, "desktop_1440_products_all.png"), fullPage: false });
 
-    if (hasOnlyBuddhas && hasOnlyHindus && allProductTitles.length === 24) {
+    if (
+      homeFeaturedValid &&
+      hasOnlyBuddhas &&
+      hasOnlyHindus &&
+      allProductTitles.length === 24 &&
+      productsHeaderAudit.heading === "Our Complete Collection"
+    ) {
       results.testD_category_separation.status = "PASS";
     } else {
       results.testD_category_separation.status = "FAIL";
@@ -375,12 +470,12 @@ async function runTests() {
     results.testF_mobile_and_responsive.details.push(`Mobile 390x844 horizontal overflow: ${mobileOverflow} (Expected false)`);
 
     // Target mobile-specific three-dot button
-    const mobileThreeDotBtn = await page.$("header .flex.md\\:hidden button[aria-label*='Statue Categories']");
+    const mobileThreeDotBtn = await page.$("header .flex.lg\\:hidden button[aria-label*='Statue Categories']");
     if (mobileThreeDotBtn) {
       await mobileThreeDotBtn.click();
       await page.waitForTimeout(250);
       const isMobileMenuOpen = await page.evaluate(() => {
-        const m = document.querySelector("header .flex.md\\:hidden div[role='menu']");
+        const m = document.querySelector("header .flex.lg\\:hidden div[role='menu']");
         return !!m;
       });
       results.testF_mobile_and_responsive.details.push(`Mobile three-dot menu opens: ${isMobileMenuOpen}`);
@@ -388,17 +483,23 @@ async function runTests() {
       // Capture mobile screenshot with three-dot menu open
       await page.screenshot({ path: path.join(OUTPUT_DIR, "mobile_390_threedot_open.png"), fullPage: false });
 
-      // Click Buddha Statues in mobile menu
-      const mobileBuddhaOption = await page.$("header .flex.md\\:hidden div[role='menu'] button:has-text('Buddha Statues')");
+      // Click Buddha Statues in mobile menu -> navigates to /products?category=buddha
+      const mobileBuddhaOption = await page.$("header .flex.lg\\:hidden div[role='menu'] button:has-text('Buddha Statues')");
       if (mobileBuddhaOption) {
-        await mobileBuddhaOption.click();
+        await Promise.all([
+          page.waitForURL("**/products?category=buddha"),
+          mobileBuddhaOption.click(),
+        ]);
+        await page.waitForLoadState("networkidle");
         await page.waitForTimeout(400);
         const mobileBuddhaCards = await page.$$eval("article", (cards) => cards.length);
         results.testF_mobile_and_responsive.details.push(`Mobile Buddha selection displays ${mobileBuddhaCards} cards (Expected 5)`);
+        await page.screenshot({ path: path.join(OUTPUT_DIR, "mobile_390_products.png"), fullPage: false });
       }
     }
 
     // Capture mobile full home view
+    await page.goto(`${BASE_URL}/`, { waitUntil: "networkidle" });
     await page.screenshot({ path: path.join(OUTPUT_DIR, "mobile_390_home.png"), fullPage: false });
 
     // Test mobile about page
@@ -487,17 +588,21 @@ async function runTests() {
     results.testG_functional_interactions.status = "PASS";
 
     // -------------------------------------------------------------
-    // Test H: Brochure Images and Assets Integrity
+    // Test H: Brochure Images and Assets Integrity (/products all 24)
     // -------------------------------------------------------------
     console.log("Running Test H: Brochure Images and Assets Integrity...");
-    await page.goto(`${BASE_URL}/`, { waitUntil: "networkidle" });
+    await page.goto(`${BASE_URL}/products`, { waitUntil: "networkidle" });
 
-    // Scroll catalogue section into view so lazy-loaded product images hydrate
-    const catalogueSectionEl = await page.$("#catalogue");
-    if (catalogueSectionEl) {
-      await catalogueSectionEl.scrollIntoViewIfNeeded();
-      await page.waitForTimeout(600);
+    // Scroll through all product cards so lazy-loaded product images hydrate
+    const cardsCount = await page.$$eval("article", (els) => els.length);
+    for (let i = 0; i < cardsCount; i += 3) {
+      await page.evaluate((idx) => {
+        const cards = document.querySelectorAll("article");
+        if (cards[idx]) cards[idx].scrollIntoView({ behavior: "instant", block: "center" });
+      }, i);
+      await page.waitForTimeout(150);
     }
+    await page.waitForTimeout(500);
 
     // Collect all product images on the page
     const productImgs = await page.evaluate(() => {
@@ -592,7 +697,14 @@ async function runTests() {
     }
 
     // Verify NO external stock images are being requested
-    const externalImgRequests = failedRequests.filter((r) => !r.url.startsWith("http://localhost:"));
+    const baseOrigin = new URL(BASE_URL).origin;
+    const externalImgRequests = failedRequests.filter((r) => {
+      try {
+        return new URL(r.url).origin !== baseOrigin;
+      } catch {
+        return true;
+      }
+    });
     results.testH_brochure_images_and_assets.details.push(`External image requests: ${externalImgRequests.length}`);
 
     if (
@@ -615,7 +727,7 @@ async function runTests() {
     // Test I: Final UI Cleanup & Contact Details (No Page Badges, New Email, Exact Hours, No Address)
     // -------------------------------------------------------------
     console.log("Running Test I: Final UI Cleanup & Contact Details...");
-    await page.goto(`${BASE_URL}/`, { waitUntil: "networkidle" });
+    await page.goto(`${BASE_URL}/products`, { waitUntil: "networkidle" });
 
     // 1. Verify absence of Page badges and presence of category badges across ALL product cards
     const cardBadgeAudit = await page.evaluate(() => {
@@ -909,6 +1021,599 @@ async function runTests() {
       results.testJ_about_redesign_and_catalogue_section.status = "FAIL";
     }
 
+    // -------------------------------------------------------------
+    // Test K: Hero Vertical Smartphone-Sized Video Integration
+    // -------------------------------------------------------------
+    console.log("Running Test K: Hero Vertical Smartphone Video Integration...");
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto(`${BASE_URL}/`, { waitUntil: "networkidle" });
+    await page.waitForTimeout(800);
+
+    const heroVideoDesktop = await page.evaluate(() => {
+      const frame = document.querySelector("#hero-video-frame");
+      const video = frame?.querySelector("video");
+      if (!frame || !video) return null;
+      const rect = frame.getBoundingClientRect();
+      const vRect = video.getBoundingClientRect();
+      const aspectRatio = rect.width / rect.height;
+      return {
+        src: video.getAttribute("src"),
+        poster: video.getAttribute("poster"),
+        autoplay: video.autoplay,
+        muted: video.muted,
+        loop: video.loop,
+        playsInline: video.playsInline,
+        hasControls: video.hasAttribute("controls"),
+        paused: video.paused,
+        readyState: video.readyState,
+        videoWidth: video.videoWidth,
+        videoHeight: video.videoHeight,
+        frameWidth: Math.round(rect.width),
+        frameHeight: Math.round(rect.height),
+        renderedWidth: Math.round(vRect.width),
+        renderedHeight: Math.round(vRect.height),
+        aspectRatio: Number(aspectRatio.toFixed(4)),
+        objectFit: window.getComputedStyle(video).objectFit,
+        overflowX: document.documentElement.scrollWidth > window.innerWidth,
+      };
+    });
+
+    results.testK_hero_vertical_video.details.push(
+      `Desktop 1440px Hero Video: ${JSON.stringify(heroVideoDesktop)}`
+    );
+    await page.screenshot({ path: path.join(OUTPUT_DIR, "desktop_1440_hero_video.png"), fullPage: false });
+
+    // Tablet 768x1024
+    await page.setViewportSize({ width: 768, height: 1024 });
+    await page.goto(`${BASE_URL}/`, { waitUntil: "networkidle" });
+    await page.waitForTimeout(600);
+    const heroVideoTablet = await page.evaluate(() => {
+      const frame = document.querySelector("#hero-video-frame");
+      if (!frame) return null;
+      const rect = frame.getBoundingClientRect();
+      return {
+        frameWidth: Math.round(rect.width),
+        frameHeight: Math.round(rect.height),
+        aspectRatio: Number((rect.width / rect.height).toFixed(4)),
+        overflowX: document.documentElement.scrollWidth > window.innerWidth,
+      };
+    });
+    results.testK_hero_vertical_video.details.push(
+      `Tablet 768px Hero Video: ${JSON.stringify(heroVideoTablet)}`
+    );
+    await page.screenshot({ path: path.join(OUTPUT_DIR, "tablet_768_hero_video.png"), fullPage: false });
+
+    // Mobile 390x844
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto(`${BASE_URL}/`, { waitUntil: "networkidle" });
+    await page.waitForTimeout(600);
+    const heroVideoMobile = await page.evaluate(() => {
+      const frame = document.querySelector("#hero-video-frame");
+      if (!frame) return null;
+      const rect = frame.getBoundingClientRect();
+      const viewportCenter = window.innerWidth / 2;
+      const frameCenter = rect.left + rect.width / 2;
+      return {
+        frameWidth: Math.round(rect.width),
+        frameHeight: Math.round(rect.height),
+        aspectRatio: Number((rect.width / rect.height).toFixed(4)),
+        centerOffsetPx: Math.round(Math.abs(viewportCenter - frameCenter)),
+        overflowX: document.documentElement.scrollWidth > window.innerWidth,
+      };
+    });
+    results.testK_hero_vertical_video.details.push(
+      `Mobile 390px Hero Video: ${JSON.stringify(heroVideoMobile)}`
+    );
+    // Scroll slightly to capture both text and centered smartphone video on mobile
+    await page.evaluate(() => window.scrollTo(0, 260));
+    await page.waitForTimeout(200);
+    await page.screenshot({ path: path.join(OUTPUT_DIR, "mobile_390_hero_video.png"), fullPage: false });
+
+    const desktopAspectOk = heroVideoDesktop && Math.abs(heroVideoDesktop.aspectRatio - 9 / 16) < 0.03;
+    const desktopSizeOk = heroVideoDesktop && heroVideoDesktop.frameWidth >= 220 && heroVideoDesktop.frameWidth <= 320;
+    const tabletProportionOk = heroVideoTablet && heroVideoTablet.frameWidth < heroVideoDesktop.frameWidth && !heroVideoTablet.overflowX;
+    const mobileCenteredOk = heroVideoMobile && heroVideoMobile.centerOffsetPx <= 5 && !heroVideoMobile.overflowX;
+
+    const passesTestK =
+      heroVideoDesktop &&
+      heroVideoDesktop.src === "/videos/advaita-tattva-hero.mp4" &&
+      heroVideoDesktop.poster === "/videos/advaita-tattva-hero-poster.jpg" &&
+      heroVideoDesktop.autoplay &&
+      heroVideoDesktop.muted &&
+      heroVideoDesktop.loop &&
+      heroVideoDesktop.playsInline &&
+      !heroVideoDesktop.hasControls &&
+      !heroVideoDesktop.paused &&
+      heroVideoDesktop.readyState >= 2 &&
+      heroVideoDesktop.objectFit === "cover" &&
+      desktopAspectOk &&
+      desktopSizeOk &&
+      tabletProportionOk &&
+      mobileCenteredOk;
+
+    if (passesTestK) {
+      results.testK_hero_vertical_video.status = "PASS";
+    } else {
+      results.testK_hero_vertical_video.status = "FAIL";
+    }
+
+    // -------------------------------------------------------------
+    // Test L: Video Gallery Horizontal Carousel ("The Art in Motion")
+    // -------------------------------------------------------------
+    console.log("Running Test L: Video Gallery Horizontal Carousel...");
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto(`${BASE_URL}/`, { waitUntil: "networkidle" });
+
+    const vgEl = await page.$("#video-gallery");
+    if (vgEl) {
+      await vgEl.scrollIntoViewIfNeeded();
+      await page.waitForTimeout(500);
+    }
+
+    // 1. Verify horizontal carousel geometry & arrow controls on Desktop (1440x900)
+    const carouselDesktopAudit = await page.evaluate(() => {
+      const track = document.querySelector("#video-gallery [data-video-carousel-track='true']");
+      if (!track) return null;
+      const cards = Array.from(track.querySelectorAll("figure"));
+      const firstRect = cards[0]?.getBoundingClientRect();
+      const lastRect = cards[cards.length - 1]?.getBoundingClientRect();
+      const trackRect = track.getBoundingClientRect();
+
+      // Count cards substantially visible in initial viewport (~3 desktop)
+      const visibleCount = cards.filter((c) => {
+        const r = c.getBoundingClientRect();
+        return r.left >= trackRect.left - 10 && r.right <= trackRect.right + 10;
+      }).length;
+
+      // Single horizontal row check (all tops aligned)
+      const singleHorizontalRow = cards.every(
+        (c) => Math.abs(c.getBoundingClientRect().top - firstRect.top) <= 2
+      );
+
+      // No overlapping cards horizontally
+      let overlapping = false;
+      for (let i = 1; i < cards.length; i++) {
+        if (cards[i].getBoundingClientRect().left < cards[i - 1].getBoundingClientRect().right - 1) {
+          overlapping = true;
+          break;
+        }
+      }
+
+      const prevBtn = document.querySelector("#video-gallery button[data-carousel-control='prev']");
+      const nextBtn = document.querySelector("#video-gallery button[data-carousel-control='next']");
+
+      return {
+        isScrollable: track.scrollWidth > track.clientWidth,
+        scrollWidth: Math.round(track.scrollWidth),
+        clientWidth: Math.round(track.clientWidth),
+        firstCardWidth: Math.round(firstRect?.width ?? 0),
+        lastCardLeft: Math.round(lastRect?.left ?? 0),
+        visibleCount,
+        singleHorizontalRow,
+        overlapping,
+        prevDisabledInitially: !!prevBtn?.disabled,
+        nextDisabledInitially: !!nextBtn?.disabled,
+      };
+    });
+
+    // Capture desktop carousel screenshot before interacting with controls
+    await page.screenshot({ path: path.join(OUTPUT_DIR, "desktop_1440_video_gallery.png"), fullPage: false });
+
+    // Click Next arrow -> scrolls smoothly right and pauses offscreen earlier cards
+    const nextArrow = page.locator("#video-gallery button[data-carousel-control='next']");
+    const prevArrow = page.locator("#video-gallery button[data-carousel-control='prev']");
+    await nextArrow.click();
+    await page.waitForTimeout(700);
+    const scrollAfterNext = await page.evaluate(() => {
+      const track = document.querySelector("#video-gallery [data-video-carousel-track='true']");
+      return {
+        scrollLeft: Math.round(track?.scrollLeft ?? 0),
+        prevDisabledAfterNext: !!document.querySelector("#video-gallery button[data-carousel-control='prev']")?.disabled,
+      };
+    });
+
+    // Click Prev arrow back to start
+    await prevArrow.click();
+    await page.waitForTimeout(700);
+
+    // Scroll through each video horizontally to confirm all 13 load metadata cleanly
+    const vgCardCount = await page.$$eval("#video-gallery figure", (els) => els.length);
+    for (let i = 0; i < vgCardCount; i++) {
+      await page.evaluate((idx) => {
+        const cards = document.querySelectorAll("#video-gallery figure");
+        if (cards[idx]) cards[idx].scrollIntoView({ behavior: "instant", inline: "start", block: "nearest" });
+      }, i);
+      await page.waitForTimeout(150);
+    }
+    await page.evaluate(() => {
+      const track = document.querySelector("#video-gallery [data-video-carousel-track='true']");
+      if (track) track.scrollLeft = 0;
+    });
+    await page.waitForTimeout(450);
+
+    const videoGalleryAudit = await page.evaluate(() => {
+      const cat = document.querySelector("#catalogue");
+      const vg = document.querySelector("#video-gallery");
+      const footer = document.querySelector("footer");
+      if (!cat || !vg || !footer) return null;
+
+      const vgAfterCat = (cat.compareDocumentPosition(vg) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0;
+      const footerAfterVg = (vg.compareDocumentPosition(footer) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0;
+      const heading = vg.querySelector("h2")?.textContent?.trim();
+      const subtitle = vg.querySelector("p")?.textContent?.trim();
+      const videoCards = Array.from(vg.querySelectorAll("figure"));
+      const hasCuratingPlaceholder = vg.textContent.includes("Craftsmanship Films Curating Soon");
+      const leaksInternalPath = vg.textContent.includes("src/config") || vg.textContent.includes("public/videos/gallery");
+
+      const videosDetail = videoCards.map((fig) => {
+        const id = fig.getAttribute("data-video-id");
+        const video = fig.querySelector("video");
+        const playBtn = fig.querySelector("button[data-video-control='play-pause']");
+        const muteBtn = fig.querySelector("button[data-video-control='mute-unmute']");
+        return {
+          id,
+          src: video?.getAttribute("src"),
+          poster: video?.getAttribute("poster"),
+          readyState: video?.readyState ?? 0,
+          networkState: video?.networkState ?? 0,
+          muted: video?.muted ?? false,
+          hasError: !!video?.error,
+          videoWidth: video?.videoWidth ?? 0,
+          videoHeight: video?.videoHeight ?? 0,
+          hasControls: !!playBtn && !!muteBtn,
+        };
+      });
+
+      return {
+        exists: true,
+        vgAfterCat,
+        footerAfterVg,
+        heading,
+        subtitle,
+        videoCount: videoCards.length,
+        hasCuratingPlaceholder,
+        leaksInternalPath,
+        bg: window.getComputedStyle(vg).backgroundColor,
+        overflowDesktop: document.documentElement.scrollWidth > window.innerWidth,
+        videosDetail,
+      };
+    });
+
+    // Verify HTTP 200 for all 13 videos & posters via fetch HEAD
+    const mediaHttpChecks = await page.evaluate(async () => {
+      const videos = Array.from(document.querySelectorAll("#video-gallery video"));
+      const checks = [];
+      for (const v of videos) {
+        const src = v.getAttribute("src");
+        const poster = v.getAttribute("poster");
+        const vRes = await fetch(src, { method: "HEAD" });
+        const pRes = poster ? await fetch(poster, { method: "HEAD" }) : { status: 0 };
+        checks.push({ src, vStatus: vRes.status, poster, pStatus: pRes.status });
+      }
+      return checks;
+    });
+
+    // Verify independent Play/Pause & Mute/Unmute controls on the first card without affecting the second
+    let controlsIndependent = false;
+    if (vgCardCount >= 2) {
+      const firstCard = page.locator("#video-gallery figure").first();
+      await firstCard.locator("button[data-video-control='mute-unmute']").click();
+      await firstCard.locator("button[data-video-control='play-pause']").click();
+      await page.waitForTimeout(200);
+
+      controlsIndependent = await page.evaluate(() => {
+        const cards = document.querySelectorAll("#video-gallery figure");
+        const v0 = cards[0]?.querySelector("video");
+        const v1 = cards[1]?.querySelector("video");
+        return !!v0 && !!v1 && v0.muted === false && v1.muted === true;
+      });
+    }
+
+    // 2. Tablet check (768x1024)
+    await page.setViewportSize({ width: 768, height: 1024 });
+    await page.goto(`${BASE_URL}/`, { waitUntil: "networkidle" });
+    const vgTabletEl = await page.$("#video-gallery");
+    if (vgTabletEl) await vgTabletEl.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(350);
+    const tabletCarouselAudit = await page.evaluate(() => {
+      const track = document.querySelector("#video-gallery [data-video-carousel-track='true']");
+      if (!track) return null;
+      const trackRect = track.getBoundingClientRect();
+      const cards = Array.from(track.querySelectorAll("figure"));
+      const visibleCount = cards.filter((c) => {
+        const r = c.getBoundingClientRect();
+        return r.left >= trackRect.left - 10 && r.right <= trackRect.right + 10;
+      }).length;
+      return {
+        visibleCount,
+        isScrollable: track.scrollWidth > track.clientWidth,
+        overflowX: document.documentElement.scrollWidth > window.innerWidth,
+      };
+    });
+    await page.screenshot({ path: path.join(OUTPUT_DIR, "tablet_768_video_gallery.png"), fullPage: false });
+
+    // 3. Mobile check (390x844) -> 1 card + peek of 2nd card + swipeable without page overflow
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto(`${BASE_URL}/`, { waitUntil: "networkidle" });
+    const vgMobileEl = await page.$("#video-gallery");
+    if (vgMobileEl) await vgMobileEl.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(350);
+    const mobileCarouselAudit = await page.evaluate(() => {
+      const track = document.querySelector("#video-gallery [data-video-carousel-track='true']");
+      if (!track) return null;
+      const trackRect = track.getBoundingClientRect();
+      const cards = Array.from(track.querySelectorAll("figure"));
+      const card0 = cards[0]?.getBoundingClientRect();
+      const card1 = cards[1]?.getBoundingClientRect();
+      const hasNextPeek = !!card1 && card1.left < trackRect.right - 10;
+      return {
+        firstCardRatioToTrack: Number(((card0?.width ?? 0) / trackRect.width).toFixed(2)),
+        hasNextPeek,
+        isScrollable: track.scrollWidth > track.clientWidth,
+        overflowX: document.documentElement.scrollWidth > window.innerWidth,
+      };
+    });
+    await page.screenshot({ path: path.join(OUTPUT_DIR, "mobile_390_video_gallery.png"), fullPage: false });
+
+    const allMedia200 =
+      mediaHttpChecks.length === 13 &&
+      mediaHttpChecks.every((c) => c.vStatus === 200 && c.pStatus === 200);
+    const allVideosLoadedMeta =
+      videoGalleryAudit?.videosDetail?.length === 13 &&
+      videoGalleryAudit.videosDetail.every((v) => !v.hasError && v.readyState >= 1 && v.videoWidth > 0 && v.hasControls);
+
+    results.testL_video_gallery_section.details.push(
+      `Desktop Carousel Audit: ${JSON.stringify(carouselDesktopAudit)}`,
+      `Scroll After Next Arrow: ${JSON.stringify(scrollAfterNext)}`,
+      `Media Audit: count=${videoGalleryAudit?.videoCount}, allMedia200=${allMedia200}, allVideosLoadedMeta=${allVideosLoadedMeta}, controlsIndependent=${controlsIndependent}`,
+      `Tablet Carousel Audit (768px): ${JSON.stringify(tabletCarouselAudit)}`,
+      `Mobile Carousel Audit (390px): ${JSON.stringify(mobileCarouselAudit)}`
+    );
+
+    const passesTestL =
+      videoGalleryAudit &&
+      videoGalleryAudit.exists &&
+      videoGalleryAudit.vgAfterCat &&
+      videoGalleryAudit.footerAfterVg &&
+      videoGalleryAudit.heading === "The Art in Motion" &&
+      videoGalleryAudit.subtitle ===
+        "Experience the beauty, craftsmanship and timeless details of our handcrafted brass sculptures." &&
+      videoGalleryAudit.videoCount === 13 &&
+      !videoGalleryAudit.hasCuratingPlaceholder &&
+      carouselDesktopAudit?.singleHorizontalRow &&
+      carouselDesktopAudit?.isScrollable &&
+      !carouselDesktopAudit?.overlapping &&
+      carouselDesktopAudit?.visibleCount === 3 &&
+      carouselDesktopAudit?.prevDisabledInitially &&
+      !carouselDesktopAudit?.nextDisabledInitially &&
+      scrollAfterNext.scrollLeft > 400 &&
+      !scrollAfterNext.prevDisabledAfterNext &&
+      tabletCarouselAudit?.visibleCount === 2 &&
+      !tabletCarouselAudit?.overflowX &&
+      mobileCarouselAudit?.hasNextPeek &&
+      mobileCarouselAudit?.isScrollable &&
+      !mobileCarouselAudit?.overflowX &&
+      allMedia200 &&
+      allVideosLoadedMeta &&
+      controlsIndependent &&
+      !videoGalleryAudit.leaksInternalPath &&
+      !videoGalleryAudit.overflowDesktop;
+
+    if (passesTestL) {
+      results.testL_video_gallery_section.status = "PASS";
+    } else {
+      results.testL_video_gallery_section.status = "FAIL";
+    }
+
+    // -------------------------------------------------------------
+    // Test M: Official Logo Integration & Favicon/Icon Metadata
+    // -------------------------------------------------------------
+    console.log("Running Test M: Official Logo & Favicon Verification...");
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto(`${BASE_URL}/`, { waitUntil: "networkidle" });
+    await page.screenshot({ path: path.join(OUTPUT_DIR, "desktop_1440_header_logo.png"), fullPage: false });
+
+    const brandingDesktopAudit = await page.evaluate(async () => {
+      const headerImg = document.querySelector("header img[src*='advaita-tattva-logo']");
+      const hRect = headerImg?.getBoundingClientRect();
+      const headerEl = document.querySelector("header");
+
+      const iconLinks = Array.from(document.querySelectorAll("head link[rel*='icon']")).map((l) => ({
+        rel: l.getAttribute("rel"),
+        href: l.getAttribute("href"),
+        sizes: l.getAttribute("sizes"),
+        type: l.getAttribute("type"),
+      }));
+
+      const iconHttpChecks = [];
+      for (const link of iconLinks) {
+        if (!link.href) continue;
+        const res = await fetch(link.href);
+        iconHttpChecks.push({
+          href: link.href,
+          status: res.status,
+          contentType: res.headers.get("content-type"),
+        });
+      }
+
+      const explicitIconPaths = [
+        "/favicon.ico",
+        "/icons/favicon-16x16.png",
+        "/icons/favicon-32x32.png",
+        "/icons/apple-touch-icon.png",
+        "/icons/icon-192x192.png",
+        "/icons/icon-512x512.png",
+        "/brand/advaita-tattva-logo.jpg",
+      ];
+      const staticAssetChecks = [];
+      for (const p of explicitIconPaths) {
+        const res = await fetch(p);
+        staticAssetChecks.push({ path: p, status: res.status, contentType: res.headers.get("content-type") });
+      }
+
+      return {
+        headerLogoLoaded: !!headerImg && headerImg.complete && headerImg.naturalWidth > 0 && headerImg.naturalWidth === headerImg.naturalHeight,
+        headerLogoNatural: headerImg ? `${headerImg.naturalWidth}x${headerImg.naturalHeight}` : null,
+        headerLogoAspectRatio: hRect && hRect.height > 0 ? Number((hRect.width / hRect.height).toFixed(2)) : 0,
+        headerHeight: Math.round(headerEl?.getBoundingClientRect().height ?? 0),
+        iconLinks,
+        iconHttpChecks,
+        staticAssetChecks,
+      };
+    });
+
+    const footerEl = await page.$("footer");
+    if (footerEl) await footerEl.scrollIntoViewIfNeeded();
+    await page.waitForFunction(() => {
+      const img = document.querySelector("footer img[src*='advaita-tattva-logo']");
+      return !!img && img.complete && img.naturalWidth > 0;
+    }, { timeout: 5000 }).catch(() => {});
+    await page.waitForTimeout(200);
+    const footerAudit = await page.evaluate(() => {
+      const footerImg = document.querySelector("footer img[src*='advaita-tattva-logo']");
+      const fRect = footerImg?.getBoundingClientRect();
+      return {
+        footerLogoLoaded: !!footerImg && footerImg.complete && footerImg.naturalWidth > 0 && footerImg.naturalWidth === footerImg.naturalHeight,
+        footerLogoNatural: footerImg ? `${footerImg.naturalWidth}x${footerImg.naturalHeight}` : null,
+        footerLogoAspectRatio: fRect && fRect.height > 0 ? Number((fRect.width / fRect.height).toFixed(2)) : 0,
+      };
+    });
+    await page.screenshot({ path: path.join(OUTPUT_DIR, "desktop_1440_footer_logo.png"), fullPage: false });
+
+    await page.setViewportSize({ width: 768, height: 1024 });
+    await page.goto(`${BASE_URL}/`, { waitUntil: "networkidle" });
+    const headerTabletAudit = await page.evaluate(() => ({
+      height: Math.round(document.querySelector("header")?.getBoundingClientRect().height ?? 0),
+      overflowX: document.documentElement.scrollWidth > window.innerWidth,
+    }));
+    await page.screenshot({ path: path.join(OUTPUT_DIR, "tablet_768_header_logo.png"), fullPage: false });
+
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto(`${BASE_URL}/`, { waitUntil: "networkidle" });
+    const headerMobileAudit = await page.evaluate(() => ({
+      height: Math.round(document.querySelector("header")?.getBoundingClientRect().height ?? 0),
+      overflowX: document.documentElement.scrollWidth > window.innerWidth,
+    }));
+    await page.screenshot({ path: path.join(OUTPUT_DIR, "mobile_390_header_logo.png"), fullPage: false });
+
+    const allHeadIconsOk =
+      brandingDesktopAudit.iconLinks.length >= 4 &&
+      brandingDesktopAudit.iconHttpChecks.every((c) => c.status === 200);
+    const allStaticAssetsOk = brandingDesktopAudit.staticAssetChecks.every((c) => c.status === 200);
+
+    results.testM_logo_and_favicon.details.push(
+      `Desktop Branding Audit: ${JSON.stringify(brandingDesktopAudit)}`,
+      `Desktop Footer Audit: ${JSON.stringify(footerAudit)}`,
+      `Tablet Header Audit: ${JSON.stringify(headerTabletAudit)}`,
+      `Mobile Header Audit: ${JSON.stringify(headerMobileAudit)}`
+    );
+
+    const passesTestM =
+      brandingDesktopAudit.headerLogoLoaded &&
+      Math.abs(brandingDesktopAudit.headerLogoAspectRatio - 1) < 0.05 &&
+      footerAudit.footerLogoLoaded &&
+      Math.abs(footerAudit.footerLogoAspectRatio - 1) < 0.05 &&
+      brandingDesktopAudit.headerHeight <= 84 &&
+      headerTabletAudit.height <= 84 &&
+      !headerTabletAudit.overflowX &&
+      headerMobileAudit.height <= 84 &&
+      !headerMobileAudit.overflowX &&
+      allHeadIconsOk &&
+      allStaticAssetsOk;
+
+    if (passesTestM) {
+      results.testM_logo_and_favicon.status = "PASS";
+    } else {
+      results.testM_logo_and_favicon.status = "FAIL";
+    }
+
+    // -------------------------------------------------------------
+    // Test N: Security Headers, Asset Isolation & Accessibility
+    // -------------------------------------------------------------
+    console.log("Running Test N: Security Headers & Accessibility...");
+    const homeHeadersRes = await context.request.get(`${BASE_URL}/`);
+    const headers = homeHeadersRes.headers();
+    const securityAudit = {
+      xContentTypeOptions: headers["x-content-type-options"] || null,
+      referrerPolicy: headers["referrer-policy"] || null,
+      xFrameOptions: headers["x-frame-options"] || null,
+      permissionsPolicy: headers["permissions-policy"] || null,
+      hasCsp: Boolean(headers["content-security-policy"]),
+    };
+
+    const privateBrochureRes = await context.request.get(`${BASE_URL}/source-brochures/product-reference-brochure.pdf`);
+    const privateArtifactsRes = await context.request.get(`${BASE_URL}/test-artifacts/test-summary.json`);
+
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto(`${BASE_URL}/products`, { waitUntil: "networkidle" });
+    const a11yProductsAudit = await page.evaluate(() => {
+      const imgs = Array.from(document.querySelectorAll("main img"));
+      const missingAlt = imgs.filter((img) => !img.getAttribute("alt") || img.getAttribute("alt").trim().length < 3).length;
+      const buttonsWithoutLabel = Array.from(document.querySelectorAll("button")).filter((btn) => {
+        const txt = btn.textContent?.trim() || "";
+        const aria = btn.getAttribute("aria-label") || btn.getAttribute("title") || "";
+        return txt.length === 0 && aria.length === 0;
+      }).length;
+      return { totalImgs: imgs.length, missingAlt, buttonsWithoutLabel };
+    });
+
+    // Quick View dialog aria-modal & Esc check
+    await page.click("button[title='Quick View Brochure Details']");
+    await page.waitForSelector("dialog[open]");
+    const quickViewDialogAttrs = await page.evaluate(() => {
+      const d = document.querySelector("dialog[open]");
+      return {
+        ariaModal: d?.getAttribute("aria-modal"),
+        ariaLabelledBy: d?.getAttribute("aria-labelledby"),
+      };
+    });
+    await page.keyboard.press("Escape");
+    await page.waitForTimeout(200);
+
+    // Reduced-motion check on homepage Hero video
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto(`${BASE_URL}/`, { waitUntil: "networkidle" });
+    await page.waitForTimeout(400);
+    const reducedMotionHeroPaused = await page.evaluate(() => {
+      const v = document.querySelector("#hero-video-frame video");
+      return v ? v.paused : false;
+    });
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+
+    results.testN_security_and_accessibility.details.push(
+      `Security Headers: ${JSON.stringify(securityAudit)}`,
+      `Private Source Brochure HTTP Status: ${privateBrochureRes.status()} (Expected 404)`,
+      `Private Test Artifacts HTTP Status: ${privateArtifactsRes.status()} (Expected 404)`,
+      `Products A11y Audit: ${JSON.stringify(a11yProductsAudit)}`,
+      `Quick View Dialog Attrs: ${JSON.stringify(quickViewDialogAttrs)}`,
+      `Reduced Motion Pauses Hero Autoplay: ${reducedMotionHeroPaused}`,
+      `Total Console Errors (End of Run): ${consoleErrors.length}`,
+      `Total Failed Requests (End of Run): ${failedRequests.length}`,
+      ...(failedRequests.length > 0 ? [`Failed Request Samples: ${JSON.stringify(failedRequests.slice(0, 5))}`] : [])
+    );
+
+    const passesSecurity =
+      securityAudit.xContentTypeOptions === "nosniff" &&
+      Boolean(securityAudit.referrerPolicy) &&
+      securityAudit.xFrameOptions === "SAMEORIGIN" &&
+      Boolean(securityAudit.permissionsPolicy) &&
+      securityAudit.hasCsp &&
+      privateBrochureRes.status() === 404 &&
+      privateArtifactsRes.status() === 404;
+
+    const passesA11y =
+      a11yProductsAudit.missingAlt === 0 &&
+      a11yProductsAudit.buttonsWithoutLabel === 0 &&
+      quickViewDialogAttrs.ariaModal === "true" &&
+      Boolean(quickViewDialogAttrs.ariaLabelledBy) &&
+      reducedMotionHeroPaused;
+
+    if (passesSecurity && passesA11y && consoleErrors.length === 0) {
+      results.testN_security_and_accessibility.status = "PASS";
+    } else {
+      results.testN_security_and_accessibility.status = "FAIL";
+    }
+
   } catch (err) {
     console.error("Test execution exception:", err);
   } finally {
@@ -916,9 +1621,15 @@ async function runTests() {
   }
 
   // Save report
+  fs.writeFileSync(path.join(OUTPUT_DIR, `test-summary-${PW_BROWSER}.json`), JSON.stringify(results, null, 2));
   fs.writeFileSync(path.join(OUTPUT_DIR, "test-summary.json"), JSON.stringify(results, null, 2));
   console.log("Test suite finished. Results summary:");
   console.log(JSON.stringify(results, null, 2));
+
+  const anyFailed = Object.values(results).some((r) => r.status !== "PASS");
+  if (anyFailed) {
+    process.exitCode = 1;
+  }
 }
 
 runTests();

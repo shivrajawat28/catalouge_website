@@ -25,8 +25,9 @@ export function WhatsAppBrandButton({
   className?: string;
   label?: string;
 }) {
+  const cleanPhone = phone.replace(/\D/g, "");
   const encodedText = text ? encodeURIComponent(text) : "";
-  const href = `https://wa.me/${phone}${encodedText ? `?text=${encodedText}` : ""}`;
+  const href = `https://wa.me/${cleanPhone}${encodedText ? `?text=${encodedText}` : ""}`;
 
   return (
     <a

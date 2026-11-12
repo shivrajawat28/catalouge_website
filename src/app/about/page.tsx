@@ -103,7 +103,7 @@ export default function AboutPage() {
         {/* ============================================================ */}
         <section className="py-16 sm:py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mb-12 space-y-3">
-            <span className="text-xs font-semibold tracking-[0.25em] uppercase text-[#B38A38]">
+            <span className="text-xs font-semibold tracking-[0.25em] uppercase text-[#785A1D]">
               Foundational Belief
             </span>
             <h2 className="text-3xl sm:text-4xl font-serif font-medium text-[#1C1917] tracking-tight">
@@ -143,7 +143,7 @@ export default function AboutPage() {
         <section className="py-16 sm:py-24 bg-[#F5F1EB] border-y border-[#E7E0D4] relative">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-3xl mx-auto mb-14 space-y-3">
-              <span className="text-xs font-semibold tracking-[0.25em] uppercase text-[#B38A38]">
+              <span className="text-xs font-semibold tracking-[0.25em] uppercase text-[#785A1D]">
                 Identity &amp; Etymology
               </span>
               <h2 className="text-3xl sm:text-4xl font-serif font-medium text-[#1C1917] tracking-tight">
@@ -167,7 +167,7 @@ export default function AboutPage() {
                   <h3 className="font-serif text-3xl sm:text-4xl font-medium tracking-wide text-[#1C1917]">
                     {aboutContent.nameMeaning.advaita.term}
                   </h3>
-                  <p className="text-xs uppercase tracking-widest font-semibold text-[#B38A38]">
+                  <p className="text-xs uppercase tracking-widest font-semibold text-[#785A1D]">
                     {aboutContent.nameMeaning.advaita.concept}
                   </p>
                   <p className="text-sm sm:text-base text-[#44403C] leading-relaxed pt-2">
@@ -186,7 +186,7 @@ export default function AboutPage() {
                   <h3 className="font-serif text-3xl sm:text-4xl font-medium tracking-wide text-[#1C1917]">
                     {aboutContent.nameMeaning.tattva.term}
                   </h3>
-                  <p className="text-xs uppercase tracking-widest font-semibold text-[#B38A38]">
+                  <p className="text-xs uppercase tracking-widest font-semibold text-[#785A1D]">
                     {aboutContent.nameMeaning.tattva.concept}
                   </p>
                   <p className="text-sm sm:text-base text-[#44403C] leading-relaxed pt-2">
@@ -229,7 +229,7 @@ export default function AboutPage() {
             {/* Left Narrative */}
             <div className="lg:col-span-7 space-y-6">
               <div className="space-y-3">
-                <span className="text-xs font-semibold tracking-[0.25em] uppercase text-[#B38A38]">
+                <span className="text-xs font-semibold tracking-[0.25em] uppercase text-[#785A1D]">
                   Evolution &amp; Heritage
                 </span>
                 <h2 className="text-3xl sm:text-4xl font-serif font-medium text-[#1C1917] tracking-tight leading-snug">
@@ -308,7 +308,7 @@ export default function AboutPage() {
         <section className="py-16 sm:py-24 bg-[#F5F1EB] border-t border-[#E7E0D4]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="max-w-3xl mb-12 space-y-3">
-              <span className="text-xs font-semibold tracking-[0.25em] uppercase text-[#B38A38]">
+              <span className="text-xs font-semibold tracking-[0.25em] uppercase text-[#785A1D]">
                 Living Tradition
               </span>
               <h2 className="text-3xl sm:text-4xl font-serif font-medium text-[#1C1917] tracking-tight leading-snug">
@@ -362,7 +362,7 @@ export default function AboutPage() {
         {/* ============================================================ */}
         <section className="py-20 sm:py-28 bg-white border-t border-[#E7E0D4] text-center">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-            <span className="text-xs font-semibold tracking-[0.25em] uppercase text-[#B38A38]">
+            <span className="text-xs font-semibold tracking-[0.25em] uppercase text-[#785A1D]">
               Sanctuary &bull; Devotion &bull; Craft
             </span>
 

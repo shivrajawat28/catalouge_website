@@ -42,6 +42,7 @@ next-env.d.ts
 
 # test artifacts
 public/test-artifacts/
+tests/artifacts/
 
 # source reference brochures
 source-brochures/

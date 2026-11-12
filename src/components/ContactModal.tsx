@@ -53,6 +53,7 @@ export function ContactModal({ isOpen, onClose }: ContactModalProps) {
   return (
     <dialog
       ref={dialogRef}
+      aria-modal="true"
       onCancel={handleCancel}
       onClick={handleBackdropClick}
       aria-labelledby="contact-modal-title"
@@ -62,7 +63,7 @@ export function ContactModal({ isOpen, onClose }: ContactModalProps) {
         {/* Header */}
         <div className="flex items-start justify-between pb-5 border-b border-[#E7E0D4]">
           <div>
-            <span className="text-[11px] font-semibold tracking-[0.2em] uppercase text-[#B38A38]">
+            <span className="text-[11px] font-semibold tracking-[0.2em] uppercase text-[#785A1D]">
               Direct Studio Desk
             </span>
             <h2

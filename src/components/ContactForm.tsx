@@ -99,7 +99,7 @@ Please get in touch with me.`;
       <div className="max-w-3xl mx-auto">
         {/* Section Header */}
         <div className="text-center space-y-3 mb-12">
-          <span className="text-xs font-semibold tracking-[0.25em] uppercase text-[#B38A38]">
+          <span className="text-xs font-semibold tracking-[0.25em] uppercase text-[#785A1D]">
             Direct Artisanal Inquiries
           </span>
           <h2
@@ -158,7 +158,7 @@ Please get in touch with me.`;
                   if (errors.fullName) setErrors({ ...errors, fullName: undefined });
                 }}
                 placeholder="e.g. Rameshwar Sharma"
-                className={`w-full px-4 py-3 rounded-xl border text-sm text-[#1C1917] placeholder:text-[#8C827A] bg-[#FAF8F5] focus:bg-white focus:outline-none transition-colors ${
+                className={`w-full px-4 py-3 rounded-xl border text-sm text-[#1C1917] placeholder:text-[#6E655E] bg-[#FAF8F5] focus:bg-white focus:outline-none transition-colors ${
                   errors.fullName
                     ? "border-red-400 focus:ring-2 focus:ring-red-400/30"
                     : "border-[#D8CCBD] focus:border-[#B38A38] focus:ring-2 focus:ring-[#B38A38]/20"
@@ -196,7 +196,7 @@ Please get in touch with me.`;
                   if (errors.phoneNumber) setErrors({ ...errors, phoneNumber: undefined });
                 }}
                 placeholder="e.g. +91 98765 43210 or 9876543210"
-                className={`w-full px-4 py-3 rounded-xl border text-sm text-[#1C1917] placeholder:text-[#8C827A] bg-[#FAF8F5] focus:bg-white focus:outline-none transition-colors ${
+                className={`w-full px-4 py-3 rounded-xl border text-sm text-[#1C1917] placeholder:text-[#6E655E] bg-[#FAF8F5] focus:bg-white focus:outline-none transition-colors ${
                   errors.phoneNumber
                     ? "border-red-400 focus:ring-2 focus:ring-red-400/30"
                     : "border-[#D8CCBD] focus:border-[#B38A38] focus:ring-2 focus:ring-[#B38A38]/20"
@@ -233,7 +233,7 @@ Please get in touch with me.`;
                   if (errors.message) setErrors({ ...errors, message: undefined });
                 }}
                 placeholder="Please mention the sculpture name, dimensions, or specific questions..."
-                className={`w-full px-4 py-3 rounded-xl border text-sm text-[#1C1917] placeholder:text-[#8C827A] bg-[#FAF8F5] focus:bg-white focus:outline-none transition-colors resize-y ${
+                className={`w-full px-4 py-3 rounded-xl border text-sm text-[#1C1917] placeholder:text-[#6E655E] bg-[#FAF8F5] focus:bg-white focus:outline-none transition-colors resize-y ${
                   errors.message
                     ? "border-red-400 focus:ring-2 focus:ring-red-400/30"
                     : "border-[#D8CCBD] focus:border-[#B38A38] focus:ring-2 focus:ring-[#B38A38]/20"

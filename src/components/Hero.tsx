@@ -1,19 +1,70 @@
 "use client";
 
-import React, { useState } from "react";
-import Image from "next/image";
+import React, { useState, useRef, useEffect } from "react";
 import { siteConfig } from "@/config/siteConfig";
 import { ContactModal } from "./ContactModal";
-import { FileText, FileDown, ArrowUpRight, Sparkles, Shield, ChevronDown } from "lucide-react";
+import { FileText, FileDown, ArrowUpRight, Sparkles, Play } from "lucide-react";
 
 export function Hero() {
   const [isContactOpen, setIsContactOpen] = useState(false);
+  const [autoplayBlocked, setAutoplayBlocked] = useState(false);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    // Enforce muted properties prior to playback for reliable cross-browser autoplay
+    video.defaultMuted = true;
+    video.muted = true;
+
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReducedMotion) {
+      video.autoplay = false;
+      video.pause();
+    }
+
+    const attemptAutoplay = async () => {
+      await Promise.resolve();
+      if (prefersReducedMotion) {
+        video.autoplay = false;
+        if (!video.paused) {
+          video.pause();
+        }
+        setAutoplayBlocked(true);
+        return;
+      }
+
+      try {
+        if (video.paused) {
+          await video.play();
+        }
+        setAutoplayBlocked(false);
+      } catch {
+        setAutoplayBlocked(true);
+      }
+    };
+
+    attemptAutoplay();
+  }, []);
+
+  const handleManualPlay = async () => {
+    const video = videoRef.current;
+    if (!video) return;
+    try {
+      video.muted = true;
+      await video.play();
+      setAutoplayBlocked(false);
+    } catch {
+      setAutoplayBlocked(true);
+    }
+  };
 
   return (
     <>
-      <section className="relative w-full overflow-hidden pt-12 pb-20 sm:pt-16 sm:pb-28 lg:pt-20 lg:pb-32 bg-[#FAF8F5] border-b border-[#E7E0D4]">
+      <section className="relative w-full overflow-hidden pt-10 pb-16 sm:pt-14 sm:pb-24 lg:pt-16 lg:pb-24 bg-[#FAF8F5] border-b border-[#E7E0D4]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 md:gap-12 lg:gap-8 items-center">
             {/* Left Column: Editorial Headline & Actions (7 cols on lg) */}
             <div className="lg:col-span-7 space-y-6 sm:space-y-8 text-left">
               {/* Artisanal Heritage Tag */}
@@ -89,74 +140,43 @@ export function Hero() {
               </div>
             </div>
 
-            {/* Right Column: Editorial Product Imagery Arrangement from Brochure (5 cols on lg) */}
-            <div className="lg:col-span-5 relative">
-              <div className="relative mx-auto max-w-md lg:max-w-none">
-                {/* Primary Spotlight Card: Buddha under Bodhi Tree (Page 5) */}
-                <div className="relative z-10 bg-white rounded-3xl p-6 sm:p-7 border border-[#E7E0D4] shadow-xl">
-                  <div className="relative aspect-square w-full bg-[#FAF8F5] rounded-2xl overflow-hidden flex items-center justify-center p-4">
-                    <Image
-                      src="/products/buddha-bodhi-tree.jpg"
-                      alt="Buddha under Bodhi Tree - Advaita Tattva Brochure"
-                      width={600}
-                      height={600}
-                      priority
-                      className="max-h-full max-w-full object-contain drop-shadow-xl hover:scale-105 transition-transform duration-700"
-                    />
+            {/* Right Column: Vertical 9:16 Smartphone-Sized Video Showcase (5 cols on lg) */}
+            <div className="lg:col-span-5 flex justify-center lg:justify-end">
+              <div
+                id="hero-video-frame"
+                className="relative w-[220px] sm:w-[245px] md:w-[255px] lg:w-[275px] xl:w-[290px] aspect-[9/16] rounded-[2rem] p-1.5 bg-[#1C1917] ring-1 ring-[#B38A38]/35 shadow-md"
+              >
+                <div className="relative w-full h-full rounded-[1.625rem] overflow-hidden bg-[#1C1917]">
+                  <video
+                    ref={videoRef}
+                    src="/videos/advaita-tattva-hero.mp4"
+                    poster="/videos/advaita-tattva-hero-poster.jpg"
+                    width={1080}
+                    height={1920}
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    preload="auto"
+                    disablePictureInPicture
+                    onPlay={() => setAutoplayBlocked(false)}
+                    className="w-full h-full object-cover block"
+                    aria-label="Advaita Tattva antique brass idol craftsmanship showcase"
+                  />
 
-                    <span className="absolute bottom-3 left-3 px-3 py-1 rounded-full bg-white/90 backdrop-blur-xs border border-[#E7E0D4] text-[10px] font-semibold tracking-wider uppercase text-[#785A1D]">
-                      Solid Antique Brass &bull; 6″ to 12″
-                    </span>
-                  </div>
-
-                  <div className="mt-5 flex items-start justify-between">
-                    <div>
-                      <p className="text-[10px] uppercase font-bold tracking-widest text-[#B38A38]">
-                        Featured Buddha Statue
-                      </p>
-                      <h3 className="font-serif text-xl font-medium text-[#1C1917] mt-0.5">
-                        Buddha under Bodhi Tree
-                      </h3>
-                      <p className="text-xs text-[#785A1D]">
-                        Antique Brass &bull; Up to 787 g
-                      </p>
-                    </div>
-
-                    <a
-                      href="#catalogue"
-                      className="inline-flex items-center gap-1 text-xs font-semibold text-[#1C1917] hover:text-[#B38A38] transition-colors mt-2"
+                  {/* Subtle fallback play button shown only if browser autoplay is restricted */}
+                  {autoplayBlocked && (
+                    <button
+                      type="button"
+                      onClick={handleManualPlay}
+                      aria-label="Play showcase video"
+                      className="absolute inset-0 flex items-center justify-center bg-[#1C1917]/30 backdrop-blur-[2px] transition-opacity hover:bg-[#1C1917]/40 cursor-pointer"
                     >
-                      <span>Explore</span>
-                      <ChevronDown className="w-3.5 h-3.5" />
-                    </a>
-                  </div>
-                </div>
-
-                {/* Secondary Layered Card: Lord Ganesha */}
-                <div className="hidden sm:block absolute -bottom-8 -left-8 z-20 w-48 bg-white/95 backdrop-blur-sm rounded-2xl p-3 border border-[#E7E0D4] shadow-2xl">
-                  <div className="relative aspect-square bg-[#FAF8F5] rounded-xl overflow-hidden p-2 flex items-center justify-center">
-                    <Image
-                      src="/products/lord-ganesha.jpg"
-                      alt="Lord Ganesha - Solid Brass Statue"
-                      width={200}
-                      height={200}
-                      className="max-h-full max-w-full object-contain drop-shadow-sm"
-                    />
-                  </div>
-                  <div className="mt-2 text-center">
-                    <p className="text-[11px] font-serif font-medium text-[#1C1917] truncate">
-                      Lord Ganesha
-                    </p>
-                    <p className="text-[9px] uppercase tracking-wider text-[#785A1D]">
-                      Hindu Statue &bull; Antique Brass
-                    </p>
-                  </div>
-                </div>
-
-                {/* Floating Authentic Stamp */}
-                <div className="hidden sm:flex absolute -top-4 -right-4 z-20 items-center gap-2 px-3.5 py-2 rounded-full bg-[#1C1917] text-white shadow-xl text-[10px] uppercase font-semibold tracking-widest">
-                  <Shield className="w-3.5 h-3.5 text-[#C5A059]" />
-                  <span>Advaita Tattva Certified</span>
+                      <span className="w-12 h-12 rounded-full bg-[#FAF8F5]/90 text-[#1C1917] border border-[#B38A38]/50 flex items-center justify-center shadow-sm">
+                        <Play className="w-5 h-5 fill-current ml-0.5" />
+                      </span>
+                    </button>
+                  )}
                 </div>
               </div>
             </div>

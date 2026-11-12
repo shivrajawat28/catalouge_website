@@ -1,25 +1,55 @@
 "use client";
 
-import React, { useState, useEffect, useId } from "react";
+import React, { useState, useEffect, useId, useRef } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { ProductItem, ProductCategory, siteConfig } from "@/config/siteConfig";
 import { WhatsAppIcon } from "./Icons";
 import { Eye, ArrowUpRight, X, Sparkles, Scale, Ruler, FileText } from "lucide-react";
 
-export function CatalogueShowcase() {
+export type CatalogueShowcaseVariant = "featured" | "all";
+
+interface CatalogueShowcaseProps {
+  variant?: CatalogueShowcaseVariant;
+  headingLevel?: "h1" | "h2";
+}
+
+export function CatalogueShowcase({
+  variant = "all",
+  headingLevel = "h2",
+}: CatalogueShowcaseProps) {
+  const isFeaturedOnly = variant === "featured";
   const [activeCategory, setActiveCategory] = useState<ProductCategory>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedProduct, setSelectedProduct] = useState<ProductItem | null>(null);
   const searchInputId = useId();
+  const quickViewDialogRef = useRef<HTMLDialogElement>(null);
+
+  useEffect(() => {
+    const dialog = quickViewDialogRef.current;
+    if (!dialog) return;
+
+    if (selectedProduct) {
+      if (!dialog.open) {
+        dialog.showModal();
+      }
+    } else if (dialog.open) {
+      dialog.close();
+    }
+  }, [selectedProduct]);
 
   // Read URL query parameter on mount and listen to custom event from header menu
   useEffect(() => {
+    if (isFeaturedOnly) return;
+
     function parseCategoryFromUrl() {
       if (typeof window === "undefined") return;
       const params = new URLSearchParams(window.location.search);
       const cat = params.get("category");
       if (cat === "buddha" || cat === "hindu" || cat === "all") {
         setActiveCategory(cat as ProductCategory);
+      } else {
+        setActiveCategory("all");
       }
     }
 
@@ -39,7 +69,7 @@ export function CatalogueShowcase() {
       window.removeEventListener("select-catalogue-category", handleCategoryEvent);
       window.removeEventListener("popstate", parseCategoryFromUrl);
     };
-  }, []);
+  }, [isFeaturedOnly]);
 
   // Close quick view dialog on Escape key
   useEffect(() => {
@@ -56,21 +86,25 @@ export function CatalogueShowcase() {
   const handleCategoryChange = (category: ProductCategory) => {
     setActiveCategory(category);
     if (typeof window !== "undefined") {
-      const url = category === "all" ? "/#catalogue" : `/?category=${category}#catalogue`;
+      const url = category === "all" ? "/products" : `/products?category=${category}`;
       window.history.pushState({}, "", url);
     }
   };
 
-  const filteredProducts = siteConfig.products.filter((product) => {
-    const matchesCategory =
-      activeCategory === "all" || product.category === activeCategory;
-    const matchesSearch =
-      product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.subtitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.categoryLabel.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.tagline.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCategory && matchesSearch;
-  });
+  const featuredProducts = siteConfig.products.filter((p) => p.featured);
+
+  const filteredProducts = isFeaturedOnly
+    ? featuredProducts
+    : siteConfig.products.filter((product) => {
+        const matchesCategory =
+          activeCategory === "all" || product.category === activeCategory;
+        const matchesSearch =
+          product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          product.subtitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          product.categoryLabel.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          product.tagline.toLowerCase().includes(searchQuery.toLowerCase());
+        return matchesCategory && matchesSearch;
+      });
 
   const handleEnquiry = (product: ProductItem) => {
     const message = `Hello ${siteConfig.companyName}, I would like to enquire about:
@@ -86,25 +120,30 @@ Could you please share pricing and availability?`;
     window.open(`https://wa.me/${cleanNumber}?text=${encoded}`, "_blank", "noopener,noreferrer");
   };
 
-  // Dynamic headings based on selected category
+  // Dynamic headings based on variant and selected category
   const getCategoryTitle = () => {
+    if (isFeaturedOnly) return "Featured Collection";
     if (activeCategory === "buddha") return "Buddha Statues";
     if (activeCategory === "hindu") return "Hindu Statues";
-    return "Product Catalogue";
+    return "Our Complete Collection";
   };
 
   const getCategorySubtitle = () => {
+    if (isFeaturedOnly) {
+      return "Curated antique brass highlights across our Buddha and Hindu devotional collections. Explore bespoke finishes, authentic lost-wax artistry, and heirloom sizes.";
+    }
     if (activeCategory === "buddha") {
       return "Authentic lost-wax antique brass Buddha sculptures extracted directly from the official Advaita Tattva brochure.";
     }
     if (activeCategory === "hindu") {
       return "Sacred Hindu deities and devotional idols for home, puja space, and thoughtful gifting from the Advaita Tattva brochure.";
     }
-    return "Advaita Tattva Antique Brass Idol Collection. Master-crafted devotional accents extracted directly from the official product brochure.";
+    return "Explore our handcrafted antique brass idols, thoughtfully created to bring timeless artistry and spiritual elegance into your space.";
   };
 
   const buddhaCount = siteConfig.products.filter((p) => p.category === "buddha").length;
   const hinduCount = siteConfig.products.filter((p) => p.category === "hindu").length;
+  const HeadingTag = headingLevel;
 
   return (
     <section
@@ -117,85 +156,93 @@ Could you please share pricing and availability?`;
         <div className="space-y-2">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-[#E7E0D4] text-[10px] uppercase tracking-widest font-semibold text-[#785A1D]">
             <FileText className="w-3.5 h-3.5 text-[#B38A38]" />
-            <span>Advaita Tattva Brochure Collection</span>
+            <span>
+              {isFeaturedOnly
+                ? "Curated Brass Highlights"
+                : "Advaita Tattva Brochure Collection"}
+            </span>
           </div>
 
-          <h2
+          <HeadingTag
             id="catalogue-heading"
             className="text-3xl sm:text-4xl md:text-5xl font-serif font-medium text-[#1C1917] tracking-tight transition-all duration-300"
           >
             {getCategoryTitle()}
-          </h2>
+          </HeadingTag>
 
           <p className="text-sm sm:text-base text-[#44403C] max-w-2xl leading-relaxed">
             {getCategorySubtitle()}
           </p>
         </div>
 
-        {/* Search Input */}
-        <div className="w-full md:w-72">
-          <label htmlFor={searchInputId} className="sr-only">
-            Search catalogue
-          </label>
-          <input
-            id={searchInputId}
-            type="search"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search statue by name..."
-            className="w-full px-4 py-2.5 rounded-full border border-[#D8CCBD] bg-white text-xs text-[#1C1917] placeholder:text-[#8C827A] focus:outline-none focus:border-[#B38A38] focus:ring-2 focus:ring-[#B38A38]/20 transition-all shadow-2xs"
-          />
-        </div>
+        {/* Search Input (shown on Complete Collection page) */}
+        {!isFeaturedOnly && (
+          <div className="w-full md:w-72">
+            <label htmlFor={searchInputId} className="sr-only">
+              Search catalogue
+            </label>
+            <input
+              id={searchInputId}
+              type="search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search statue by name..."
+              className="w-full px-4 py-2.5 rounded-full border border-[#D8CCBD] bg-white text-xs text-[#1C1917] placeholder:text-[#6E655E] focus:outline-none focus:border-[#B38A38] focus:ring-2 focus:ring-[#B38A38]/20 transition-all shadow-2xs"
+            />
+          </div>
+        )}
       </div>
 
-      {/* Category Pills (All, Buddha Statues, Hindu Statues) */}
-      <div className="flex flex-wrap items-center gap-2.5 mb-10 pb-4 border-b border-[#E7E0D4]">
-        <button
-          type="button"
-          onClick={() => handleCategoryChange("all")}
-          className={`px-4 py-2.5 rounded-full text-xs font-medium tracking-wider uppercase transition-all duration-200 cursor-pointer ${
-            activeCategory === "all"
-              ? "bg-[#1C1917] text-white shadow-xs"
-              : "bg-white text-[#44403C] border border-[#E7E0D4] hover:border-[#B38A38] hover:text-[#1C1917]"
-          }`}
-        >
-          All Statues <span className="opacity-70 text-[10px]">({siteConfig.products.length})</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => handleCategoryChange("buddha")}
-          className={`px-4 py-2.5 rounded-full text-xs font-medium tracking-wider uppercase transition-all duration-200 cursor-pointer ${
-            activeCategory === "buddha"
-              ? "bg-[#1C1917] text-white shadow-xs ring-2 ring-[#B38A38]/30"
-              : "bg-white text-[#44403C] border border-[#E7E0D4] hover:border-[#B38A38] hover:text-[#1C1917]"
-          }`}
-        >
-          Buddha Statues <span className="opacity-70 text-[10px]">({buddhaCount})</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => handleCategoryChange("hindu")}
-          className={`px-4 py-2.5 rounded-full text-xs font-medium tracking-wider uppercase transition-all duration-200 cursor-pointer ${
-            activeCategory === "hindu"
-              ? "bg-[#1C1917] text-white shadow-xs ring-2 ring-[#B38A38]/30"
-              : "bg-white text-[#44403C] border border-[#E7E0D4] hover:border-[#B38A38] hover:text-[#1C1917]"
-          }`}
-        >
-          Hindu Statues <span className="opacity-70 text-[10px]">({hinduCount})</span>
-        </button>
-
-        {activeCategory !== "all" && (
+      {/* Category Pills (All Products, Buddha Statues, Hindu Statues) */}
+      {!isFeaturedOnly && (
+        <div className="flex flex-wrap items-center gap-2.5 mb-10 pb-4 border-b border-[#E7E0D4]">
           <button
             type="button"
             onClick={() => handleCategoryChange("all")}
-            className="ml-auto text-xs text-[#785A1D] hover:text-[#1C1917] hover:underline cursor-pointer"
+            className={`px-4 py-2.5 rounded-full text-xs font-medium tracking-wider uppercase transition-all duration-200 cursor-pointer ${
+              activeCategory === "all"
+                ? "bg-[#1C1917] text-white shadow-xs"
+                : "bg-white text-[#44403C] border border-[#E7E0D4] hover:border-[#B38A38] hover:text-[#1C1917]"
+            }`}
           >
-            Clear Filter &bull; Show All
+            All Products <span className="opacity-70 text-[10px]">({siteConfig.products.length})</span>
           </button>
-        )}
-      </div>
+
+          <button
+            type="button"
+            onClick={() => handleCategoryChange("buddha")}
+            className={`px-4 py-2.5 rounded-full text-xs font-medium tracking-wider uppercase transition-all duration-200 cursor-pointer ${
+              activeCategory === "buddha"
+                ? "bg-[#1C1917] text-white shadow-xs ring-2 ring-[#B38A38]/30"
+                : "bg-white text-[#44403C] border border-[#E7E0D4] hover:border-[#B38A38] hover:text-[#1C1917]"
+            }`}
+          >
+            Buddha Statues <span className="opacity-70 text-[10px]">({buddhaCount})</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => handleCategoryChange("hindu")}
+            className={`px-4 py-2.5 rounded-full text-xs font-medium tracking-wider uppercase transition-all duration-200 cursor-pointer ${
+              activeCategory === "hindu"
+                ? "bg-[#1C1917] text-white shadow-xs ring-2 ring-[#B38A38]/30"
+                : "bg-white text-[#44403C] border border-[#E7E0D4] hover:border-[#B38A38] hover:text-[#1C1917]"
+            }`}
+          >
+            Hindu Statues <span className="opacity-70 text-[10px]">({hinduCount})</span>
+          </button>
+
+          {activeCategory !== "all" && (
+            <button
+              type="button"
+              onClick={() => handleCategoryChange("all")}
+              className="ml-auto text-xs text-[#785A1D] hover:text-[#1C1917] hover:underline cursor-pointer"
+            >
+              Clear Filter &bull; Show All
+            </button>
+          )}
+        </div>
+      )}
 
       {/* Product Grid */}
       {filteredProducts.length === 0 ? (
@@ -248,6 +295,7 @@ Could you please share pricing and availability?`;
                     alt={`${product.name} - ${product.categoryLabel} from Advaita Tattva Brochure`}
                     width={600}
                     height={600}
+                    sizes="(max-width: 640px) 92vw, (max-width: 1024px) 46vw, 380px"
                     className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-500 ease-out drop-shadow-md"
                     loading="lazy"
                   />
@@ -326,11 +374,49 @@ Could you please share pricing and availability?`;
         </div>
       )}
 
+      {/* Homepage Featured Showcase CTA to Complete Collection */}
+      {isFeaturedOnly && (
+        <div
+          id="complete-collection-cta"
+          className="mt-14 rounded-2xl bg-white border border-[#E7E0D4] px-6 py-10 sm:px-10 sm:py-12 flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left shadow-xs"
+        >
+          <div className="space-y-2 max-w-xl">
+            <span className="inline-block text-[10px] font-semibold uppercase tracking-[0.22em] text-[#785A1D]">
+              {siteConfig.products.length} Handcrafted Sculptures
+            </span>
+            <h3 className="font-serif text-2xl sm:text-3xl font-medium text-[#1C1917] tracking-tight">
+              Explore Our Complete Collection
+            </h3>
+            <p className="text-sm sm:text-base text-[#44403C] leading-relaxed">
+              Discover our complete collection of handcrafted antique brass idols.
+            </p>
+          </div>
+
+          <Link
+            href="/products"
+            className="inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-full bg-[#1C1917] text-white text-xs font-semibold tracking-wider uppercase hover:bg-[#292524] hover:shadow-md transition-all active:scale-[0.98] shrink-0"
+          >
+            <span>View All Products</span>
+            <ArrowUpRight className="w-4 h-4 text-[#D4B062]" />
+          </Link>
+        </div>
+      )}
+
       {/* Quick View / Brochure Specification Modal */}
       {selectedProduct && (
         <dialog
-          open
-          onCancel={() => setSelectedProduct(null)}
+          ref={quickViewDialogRef}
+          aria-modal="true"
+          aria-labelledby="quick-view-product-title"
+          onCancel={(e) => {
+            e.preventDefault();
+            setSelectedProduct(null);
+          }}
+          onClick={(e) => {
+            if (e.target === quickViewDialogRef.current) {
+              setSelectedProduct(null);
+            }
+          }}
           onKeyDown={(e) => {
             if (e.key === "Escape") {
               setSelectedProduct(null);
@@ -341,10 +427,13 @@ Could you please share pricing and availability?`;
           <div className="p-6 sm:p-8">
             <div className="flex items-start justify-between pb-4 border-b border-[#E7E0D4]">
               <div>
-                <span className="text-[10px] font-semibold tracking-[0.2em] uppercase text-[#B38A38]">
+                <span className="text-[10px] font-semibold tracking-[0.2em] uppercase text-[#785A1D]">
                   {selectedProduct.categoryLabel}
                 </span>
-                <h3 className="font-serif text-2xl font-medium text-[#1C1917] mt-1">
+                <h3
+                  id="quick-view-product-title"
+                  className="font-serif text-2xl font-medium text-[#1C1917] mt-1"
+                >
                   {selectedProduct.name}
                 </h3>
                 <p className="text-xs text-[#785A1D] italic">

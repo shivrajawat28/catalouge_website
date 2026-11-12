@@ -116,7 +116,7 @@ export const siteConfig: SiteConfig = {
       image: "/products/seated-buddha.jpg",
       sourcePage: 4,
       code: "AT-BUD-04",
-      featured: false,
+      featured: true,
     },
     {
       id: "buddha-bodhi-tree",
@@ -609,7 +609,7 @@ export const siteConfig: SiteConfig = {
       image: "/products/lord-kubera.jpg",
       sourcePage: 9,
       code: "AT-HIN-KUB09",
-      featured: true,
+      featured: false,
     },
   ],
 
