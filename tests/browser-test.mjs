@@ -94,15 +94,15 @@ async function runTests() {
     // Test A: Startup and Page Availability
     // -------------------------------------------------------------
     console.log("Running Test A: Server responsiveness...");
-    const homeRes = await page.goto(`${BASE_URL}/`, { waitUntil: "networkidle" });
+    const homeRes = await page.goto(`${BASE_URL}/`, { waitUntil: "domcontentloaded" });
     const homeStatus = homeRes.status();
     results.testA_startup.details.push(`Home page status: ${homeStatus}`);
 
-    const aboutRes = await page.goto(`${BASE_URL}/about`, { waitUntil: "networkidle" });
+    const aboutRes = await page.goto(`${BASE_URL}/about`, { waitUntil: "domcontentloaded" });
     const aboutStatus = aboutRes.status();
     results.testA_startup.details.push(`About page status: ${aboutStatus}`);
 
-    const productsRes = await page.goto(`${BASE_URL}/products`, { waitUntil: "networkidle" });
+    const productsRes = await page.goto(`${BASE_URL}/products`, { waitUntil: "domcontentloaded" });
     const productsStatus = productsRes.status();
     results.testA_startup.details.push(`Products page status: ${productsStatus}`);
 
@@ -116,7 +116,7 @@ async function runTests() {
     // Test B: CSS and Computed Styles Verification
     // -------------------------------------------------------------
     console.log("Running Test B: CSS and Computed Styles Verification...");
-    await page.goto(`${BASE_URL}/`, { waitUntil: "networkidle" });
+    await page.goto(`${BASE_URL}/`, { waitUntil: "domcontentloaded" });
 
     // Verify computed styles on Body
     const bodyStyles = await page.evaluate(() => {
@@ -189,13 +189,13 @@ async function runTests() {
     // -------------------------------------------------------------
     console.log("Running Test C: Three-Dot Vertical Menu Behavior...");
     await page.setViewportSize({ width: 1440, height: 900 });
-    await page.goto(`${BASE_URL}/`, { waitUntil: "networkidle" });
+    await page.goto(`${BASE_URL}/`, { waitUntil: "domcontentloaded" });
     await page.screenshot({ path: path.join(OUTPUT_DIR, "desktop_1440_home.png"), fullPage: false });
 
     // Also capture desktop about screenshot
-    await page.goto(`${BASE_URL}/about`, { waitUntil: "networkidle" });
+    await page.goto(`${BASE_URL}/about`, { waitUntil: "domcontentloaded" });
     await page.screenshot({ path: path.join(OUTPUT_DIR, "desktop_1440_about.png"), fullPage: false });
-    await page.goto(`${BASE_URL}/`, { waitUntil: "networkidle" });
+    await page.goto(`${BASE_URL}/`, { waitUntil: "domcontentloaded" });
 
     // Target desktop three-dot button
     const threeDotBtn = await page.$("header nav button[aria-label*='Statue Categories']");
@@ -258,7 +258,7 @@ async function runTests() {
     // Test D: Homepage Featured 5 + /products Category Filtering & Separation
     // -------------------------------------------------------------
     console.log("Running Test D: Homepage Featured Showcase & /products Category Separation...");
-    await page.goto(`${BASE_URL}/`, { waitUntil: "networkidle" });
+    await page.goto(`${BASE_URL}/`, { waitUntil: "domcontentloaded" });
 
     // 0a. Verify Homepage displays 5 featured products balanced across Buddha & Hindu + CTA
     const homeShowcaseAudit = await page.evaluate(() => {
@@ -306,7 +306,7 @@ async function runTests() {
       page.waitForURL("**/products?category=buddha"),
       buddhaMenuItem.click(),
     ]);
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
     await page.waitForTimeout(400);
 
     // Verify URL updated
@@ -462,7 +462,7 @@ async function runTests() {
     // -------------------------------------------------------------
     console.log("Running Test F: Mobile & Responsive Layouts...");
     await page.setViewportSize({ width: 390, height: 844 });
-    await page.goto(`${BASE_URL}/`, { waitUntil: "networkidle" });
+    await page.goto(`${BASE_URL}/`, { waitUntil: "domcontentloaded" });
 
     const mobileOverflow = await page.evaluate(() => {
       return document.documentElement.scrollWidth > window.innerWidth;
@@ -490,7 +490,7 @@ async function runTests() {
           page.waitForURL("**/products?category=buddha"),
           mobileBuddhaOption.click(),
         ]);
-        await page.waitForLoadState("networkidle");
+        await page.waitForLoadState("domcontentloaded");
         await page.waitForTimeout(400);
         const mobileBuddhaCards = await page.$$eval("article", (cards) => cards.length);
         results.testF_mobile_and_responsive.details.push(`Mobile Buddha selection displays ${mobileBuddhaCards} cards (Expected 5)`);
@@ -499,11 +499,11 @@ async function runTests() {
     }
 
     // Capture mobile full home view
-    await page.goto(`${BASE_URL}/`, { waitUntil: "networkidle" });
+    await page.goto(`${BASE_URL}/`, { waitUntil: "domcontentloaded" });
     await page.screenshot({ path: path.join(OUTPUT_DIR, "mobile_390_home.png"), fullPage: false });
 
     // Test mobile about page
-    await page.goto(`${BASE_URL}/about`, { waitUntil: "networkidle" });
+    await page.goto(`${BASE_URL}/about`, { waitUntil: "domcontentloaded" });
     const mobileAboutOverflow = await page.evaluate(() => {
       return document.documentElement.scrollWidth > window.innerWidth;
     });
@@ -512,7 +512,7 @@ async function runTests() {
 
     // Tablet check (768x1024)
     await page.setViewportSize({ width: 768, height: 1024 });
-    await page.goto(`${BASE_URL}/`, { waitUntil: "networkidle" });
+    await page.goto(`${BASE_URL}/`, { waitUntil: "domcontentloaded" });
     const tabletOverflow = await page.evaluate(() => {
       return document.documentElement.scrollWidth > window.innerWidth;
     });
@@ -529,7 +529,7 @@ async function runTests() {
     // -------------------------------------------------------------
     console.log("Running Test G: Functional Interactions...");
     await page.setViewportSize({ width: 1440, height: 900 });
-    await page.goto(`${BASE_URL}/`, { waitUntil: "networkidle" });
+    await page.goto(`${BASE_URL}/`, { waitUntil: "domcontentloaded" });
 
     // 1. Contact Us Modal
     const contactBtn = await page.$("header button:has-text('Contact Us')");
@@ -591,7 +591,7 @@ async function runTests() {
     // Test H: Brochure Images and Assets Integrity (/products all 24)
     // -------------------------------------------------------------
     console.log("Running Test H: Brochure Images and Assets Integrity...");
-    await page.goto(`${BASE_URL}/products`, { waitUntil: "networkidle" });
+    await page.goto(`${BASE_URL}/products`, { waitUntil: "domcontentloaded" });
 
     // Scroll through all product cards so lazy-loaded product images hydrate
     const cardsCount = await page.$$eval("article", (els) => els.length);
@@ -727,7 +727,7 @@ async function runTests() {
     // Test I: Final UI Cleanup & Contact Details (No Page Badges, New Email, Exact Hours, No Address)
     // -------------------------------------------------------------
     console.log("Running Test I: Final UI Cleanup & Contact Details...");
-    await page.goto(`${BASE_URL}/products`, { waitUntil: "networkidle" });
+    await page.goto(`${BASE_URL}/products`, { waitUntil: "domcontentloaded" });
 
     // 1. Verify absence of Page badges and presence of category badges across ALL product cards
     const cardBadgeAudit = await page.evaluate(() => {
@@ -838,7 +838,7 @@ async function runTests() {
     });
     results.testI_final_ui_cleanup_and_contact.details.push(`Home page contains Jaipur address: ${homeAddressPresent} (Expected false)`);
 
-    await page.goto(`${BASE_URL}/about`, { waitUntil: "networkidle" });
+    await page.goto(`${BASE_URL}/about`, { waitUntil: "domcontentloaded" });
     const aboutAddressPresent = await page.evaluate(() => {
       return /Jaipur/i.test(document.body.textContent) || /Heritage Craft Quarter/i.test(document.body.textContent);
     });
@@ -871,7 +871,7 @@ async function runTests() {
     
     // --- Part 1: Verify Redesigned About Us Page ---
     await page.setViewportSize({ width: 1440, height: 900 });
-    await page.goto(`${BASE_URL}/about`, { waitUntil: "networkidle" });
+    await page.goto(`${BASE_URL}/about`, { waitUntil: "domcontentloaded" });
 
     const aboutPageAudit = await page.evaluate(() => {
       const text = document.body.textContent || "";
@@ -922,12 +922,12 @@ async function runTests() {
     // Capture About Page Screenshots (Desktop & Mobile)
     await page.screenshot({ path: path.join(OUTPUT_DIR, "desktop_1440_about_redesign.png"), fullPage: false });
     await page.setViewportSize({ width: 390, height: 844 });
-    await page.goto(`${BASE_URL}/about`, { waitUntil: "networkidle" });
+    await page.goto(`${BASE_URL}/about`, { waitUntil: "domcontentloaded" });
     await page.screenshot({ path: path.join(OUTPUT_DIR, "mobile_390_about_redesign.png"), fullPage: false });
 
     // --- Part 2: Verify Home Page Dedicated Catalogue Section ---
     await page.setViewportSize({ width: 1440, height: 900 });
-    await page.goto(`${BASE_URL}/`, { waitUntil: "networkidle" });
+    await page.goto(`${BASE_URL}/`, { waitUntil: "domcontentloaded" });
 
     const catalogueSectionAudit = await page.evaluate(() => {
       const section = document.querySelector("#catalogue-brochure");
@@ -988,7 +988,7 @@ async function runTests() {
 
     // Mobile check for Catalogue Section
     await page.setViewportSize({ width: 390, height: 844 });
-    await page.goto(`${BASE_URL}/`, { waitUntil: "networkidle" });
+    await page.goto(`${BASE_URL}/`, { waitUntil: "domcontentloaded" });
     const mobileCatEl = await page.$("#catalogue-brochure");
     if (mobileCatEl) {
       await mobileCatEl.scrollIntoViewIfNeeded();
@@ -1026,7 +1026,7 @@ async function runTests() {
     // -------------------------------------------------------------
     console.log("Running Test K: Hero Vertical Smartphone Video Integration...");
     await page.setViewportSize({ width: 1440, height: 900 });
-    await page.goto(`${BASE_URL}/`, { waitUntil: "networkidle" });
+    await page.goto(`${BASE_URL}/`, { waitUntil: "domcontentloaded" });
     await page.waitForTimeout(800);
 
     const heroVideoDesktop = await page.evaluate(() => {
@@ -1065,7 +1065,7 @@ async function runTests() {
 
     // Tablet 768x1024
     await page.setViewportSize({ width: 768, height: 1024 });
-    await page.goto(`${BASE_URL}/`, { waitUntil: "networkidle" });
+    await page.goto(`${BASE_URL}/`, { waitUntil: "domcontentloaded" });
     await page.waitForTimeout(600);
     const heroVideoTablet = await page.evaluate(() => {
       const frame = document.querySelector("#hero-video-frame");
@@ -1085,7 +1085,7 @@ async function runTests() {
 
     // Mobile 390x844
     await page.setViewportSize({ width: 390, height: 844 });
-    await page.goto(`${BASE_URL}/`, { waitUntil: "networkidle" });
+    await page.goto(`${BASE_URL}/`, { waitUntil: "domcontentloaded" });
     await page.waitForTimeout(600);
     const heroVideoMobile = await page.evaluate(() => {
       const frame = document.querySelector("#hero-video-frame");
@@ -1142,7 +1142,7 @@ async function runTests() {
     // -------------------------------------------------------------
     console.log("Running Test L: Video Gallery Horizontal Carousel...");
     await page.setViewportSize({ width: 1440, height: 900 });
-    await page.goto(`${BASE_URL}/`, { waitUntil: "networkidle" });
+    await page.goto(`${BASE_URL}/`, { waitUntil: "domcontentloaded" });
 
     const vgEl = await page.$("#video-gallery");
     if (vgEl) {
@@ -1311,7 +1311,7 @@ async function runTests() {
 
     // 2. Tablet check (768x1024)
     await page.setViewportSize({ width: 768, height: 1024 });
-    await page.goto(`${BASE_URL}/`, { waitUntil: "networkidle" });
+    await page.goto(`${BASE_URL}/`, { waitUntil: "domcontentloaded" });
     const vgTabletEl = await page.$("#video-gallery");
     if (vgTabletEl) await vgTabletEl.scrollIntoViewIfNeeded();
     await page.waitForTimeout(350);
@@ -1334,7 +1334,7 @@ async function runTests() {
 
     // 3. Mobile check (390x844) -> 1 card + peek of 2nd card + swipeable without page overflow
     await page.setViewportSize({ width: 390, height: 844 });
-    await page.goto(`${BASE_URL}/`, { waitUntil: "networkidle" });
+    await page.goto(`${BASE_URL}/`, { waitUntil: "domcontentloaded" });
     const vgMobileEl = await page.$("#video-gallery");
     if (vgMobileEl) await vgMobileEl.scrollIntoViewIfNeeded();
     await page.waitForTimeout(350);
@@ -1410,7 +1410,7 @@ async function runTests() {
     // -------------------------------------------------------------
     console.log("Running Test M: Official Logo & Favicon Verification...");
     await page.setViewportSize({ width: 1440, height: 900 });
-    await page.goto(`${BASE_URL}/`, { waitUntil: "networkidle" });
+    await page.goto(`${BASE_URL}/`, { waitUntil: "domcontentloaded" });
     await page.screenshot({ path: path.join(OUTPUT_DIR, "desktop_1440_header_logo.png"), fullPage: false });
 
     const brandingDesktopAudit = await page.evaluate(async () => {
@@ -1481,7 +1481,7 @@ async function runTests() {
     await page.screenshot({ path: path.join(OUTPUT_DIR, "desktop_1440_footer_logo.png"), fullPage: false });
 
     await page.setViewportSize({ width: 768, height: 1024 });
-    await page.goto(`${BASE_URL}/`, { waitUntil: "networkidle" });
+    await page.goto(`${BASE_URL}/`, { waitUntil: "domcontentloaded" });
     const headerTabletAudit = await page.evaluate(() => ({
       height: Math.round(document.querySelector("header")?.getBoundingClientRect().height ?? 0),
       overflowX: document.documentElement.scrollWidth > window.innerWidth,
@@ -1489,7 +1489,7 @@ async function runTests() {
     await page.screenshot({ path: path.join(OUTPUT_DIR, "tablet_768_header_logo.png"), fullPage: false });
 
     await page.setViewportSize({ width: 390, height: 844 });
-    await page.goto(`${BASE_URL}/`, { waitUntil: "networkidle" });
+    await page.goto(`${BASE_URL}/`, { waitUntil: "domcontentloaded" });
     const headerMobileAudit = await page.evaluate(() => ({
       height: Math.round(document.querySelector("header")?.getBoundingClientRect().height ?? 0),
       overflowX: document.documentElement.scrollWidth > window.innerWidth,
@@ -1545,7 +1545,7 @@ async function runTests() {
     const privateArtifactsRes = await context.request.get(`${BASE_URL}/test-artifacts/test-summary.json`);
 
     await page.setViewportSize({ width: 1440, height: 900 });
-    await page.goto(`${BASE_URL}/products`, { waitUntil: "networkidle" });
+    await page.goto(`${BASE_URL}/products`, { waitUntil: "domcontentloaded" });
     const a11yProductsAudit = await page.evaluate(() => {
       const imgs = Array.from(document.querySelectorAll("main img"));
       const missingAlt = imgs.filter((img) => !img.getAttribute("alt") || img.getAttribute("alt").trim().length < 3).length;
@@ -1572,7 +1572,7 @@ async function runTests() {
 
     // Reduced-motion check on homepage Hero video
     await page.emulateMedia({ reducedMotion: "reduce" });
-    await page.goto(`${BASE_URL}/`, { waitUntil: "networkidle" });
+    await page.goto(`${BASE_URL}/`, { waitUntil: "domcontentloaded" });
     await page.waitForTimeout(400);
     const reducedMotionHeroPaused = await page.evaluate(() => {
       const v = document.querySelector("#hero-video-frame video");

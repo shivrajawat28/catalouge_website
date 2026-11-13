@@ -1,5 +1,6 @@
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
+import { QuickNavigation } from "@/components/QuickNavigation";
 import { CatalogueSection } from "@/components/CatalogueSection";
 import { CatalogueShowcase } from "@/components/CatalogueShowcase";
 import { VideoGallery } from "@/components/VideoGallery";
@@ -13,6 +14,7 @@ export default function HomePage() {
       <Header />
       <main className="flex-1">
         <Hero />
+        <QuickNavigation />
         <CatalogueSection />
         <CatalogueShowcase variant="featured" />
         <VideoGallery />

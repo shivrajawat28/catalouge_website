@@ -308,7 +308,7 @@ export function VideoGallery() {
     <section
       id="video-gallery"
       aria-labelledby="video-gallery-heading"
-      className="w-full py-20 px-4 sm:px-6 lg:px-8 bg-[#FAF8F5] border-t border-[#E7E0D4] overflow-x-hidden"
+      className="w-full py-20 px-4 sm:px-6 lg:px-8 bg-[#FAF8F5] border-t border-[#E7E0D4] overflow-x-hidden scroll-mt-20 sm:scroll-mt-24"
     >
       <div className="max-w-7xl mx-auto">
         {/* Section Header + Carousel Navigation Arrows */}
