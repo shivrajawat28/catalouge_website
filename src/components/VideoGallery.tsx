@@ -241,11 +241,34 @@ function VideoGalleryCard({ item }: { item: GalleryVideoItem }) {
 
 export function VideoGallery() {
   const { eyebrow, title, subtitle, videos } = videoGalleryConfig;
+  const [videoList, setVideoList] = useState<GalleryVideoItem[]>(videos);
   const trackRef = useRef<HTMLDivElement | null>(null);
 
   const [canScrollPrev, setCanScrollPrev] = useState(false);
-  const [canScrollNext, setCanScrollNext] = useState(videos.length > 1);
+  const [canScrollNext, setCanScrollNext] = useState(videoList.length > 1);
   const [activeIndex, setActiveIndex] = useState(0);
+
+  // Sync dynamic videos from /api/catalog on mount
+  useEffect(() => {
+    let mounted = true;
+    async function syncDynamicVideos() {
+      try {
+        const res = await fetch("/api/catalog");
+        if (res.ok) {
+          const data = await res.json();
+          if (mounted && data.success && Array.isArray(data.videos) && data.videos.length > 0) {
+            setVideoList(data.videos);
+          }
+        }
+      } catch {
+        // Fallback to static videos
+      }
+    }
+    syncDynamicVideos();
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   const updateScrollState = useCallback(() => {
     const track = trackRef.current;
@@ -264,10 +287,10 @@ export function VideoGallery() {
       const step = firstCard.getBoundingClientRect().width + gap;
       if (step > 0) {
         const idx = Math.round(currentScroll / step);
-        setActiveIndex(Math.min(Math.max(0, idx), Math.max(0, videos.length - 1)));
+        setActiveIndex(Math.min(Math.max(0, idx), Math.max(0, videoList.length - 1)));
       }
     }
-  }, [videos.length]);
+  }, [videoList.length]);
 
   useEffect(() => {
     updateScrollState();
@@ -331,13 +354,13 @@ export function VideoGallery() {
             </p>
           </div>
 
-          {videos.length > 0 && (
+          {videoList.length > 0 && (
             <div className="flex items-center gap-3 self-start md:self-auto shrink-0">
               <span
                 className="text-xs font-medium tracking-wider uppercase text-[#785A1D] mr-1"
                 aria-live="polite"
               >
-                {activeIndex + 1} / {videos.length}
+                {activeIndex + 1} / {videoList.length}
               </span>
 
               <button
@@ -372,7 +395,7 @@ export function VideoGallery() {
         </div>
 
         {/* Horizontal Swipeable Carousel Track or Refined Empty State */}
-        {videos.length > 0 ? (
+        {videoList.length > 0 ? (
           <div
             ref={trackRef}
             role="region"
@@ -384,7 +407,7 @@ export function VideoGallery() {
             data-video-carousel-track="true"
             className="no-scrollbar flex flex-nowrap gap-5 md:gap-6 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#B38A38]/40 rounded-2xl"
           >
-            {videos.map((item) => (
+            {videoList.map((item) => (
               <VideoGalleryCard key={item.id} item={item} />
             ))}
           </div>

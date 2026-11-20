@@ -57,6 +57,13 @@ export function Footer() {
               <FileText className="w-3.5 h-3.5 text-[#B38A38]" />
               <span>PDF Catalogue</span>
             </a>
+            <Link
+              href="/admin"
+              className="inline-flex items-center gap-1 text-[#8C827A] hover:text-[#B38A38] transition-colors"
+              title="Administrator Portal"
+            >
+              <span>Admin</span>
+            </Link>
           </nav>
 
           {/* Direct Communication Channels */}

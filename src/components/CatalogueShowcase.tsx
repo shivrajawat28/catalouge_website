@@ -14,6 +14,12 @@ interface CatalogueShowcaseProps {
   headingLevel?: "h1" | "h2";
 }
 
+interface CategoryInfo {
+  id: string;
+  label: string;
+  description?: string;
+}
+
 export function CatalogueShowcase({
   variant = "all",
   headingLevel = "h2",
@@ -22,8 +28,40 @@ export function CatalogueShowcase({
   const [activeCategory, setActiveCategory] = useState<ProductCategory>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedProduct, setSelectedProduct] = useState<ProductItem | null>(null);
+  const [productsList, setProductsList] = useState<ProductItem[]>(siteConfig.products);
+  const [categoriesList, setCategoriesList] = useState<CategoryInfo[]>([
+    { id: "buddha", label: "Buddha Statues", description: "Authentic lost-wax antique brass Buddha sculptures extracted directly from the official Advaita Tattva brochure." },
+    { id: "hindu", label: "Hindu Statues", description: "Sacred Hindu deities and devotional idols for home, puja space, and thoughtful gifting from the Advaita Tattva brochure." },
+  ]);
   const searchInputId = useId();
   const quickViewDialogRef = useRef<HTMLDialogElement>(null);
+
+  // Revalidate with dynamic /api/catalog on client mount
+  useEffect(() => {
+    let mounted = true;
+    async function syncDynamicCatalog() {
+      try {
+        const res = await fetch("/api/catalog");
+        if (res.ok) {
+          const data = await res.json();
+          if (mounted && data.success) {
+            if (Array.isArray(data.products) && data.products.length > 0) {
+              setProductsList(data.products);
+            }
+            if (Array.isArray(data.categories) && data.categories.length > 0) {
+              setCategoriesList(data.categories);
+            }
+          }
+        }
+      } catch {
+        // Fallback to static siteConfig seamlessly
+      }
+    }
+    syncDynamicCatalog();
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   useEffect(() => {
     const dialog = quickViewDialogRef.current;
@@ -91,11 +129,11 @@ export function CatalogueShowcase({
     }
   };
 
-  const featuredProducts = siteConfig.products.filter((p) => p.featured);
+  const featuredProducts = productsList.filter((p) => p.featured);
 
   const filteredProducts = isFeaturedOnly
     ? featuredProducts
-    : siteConfig.products.filter((product) => {
+    : productsList.filter((product) => {
         const matchesCategory =
           activeCategory === "all" || product.category === activeCategory;
         const matchesSearch =
@@ -123,6 +161,9 @@ Could you please share pricing and availability?`;
   // Dynamic headings based on variant and selected category
   const getCategoryTitle = () => {
     if (isFeaturedOnly) return "Featured Collection";
+    if (activeCategory === "all") return "Our Complete Collection";
+    const found = categoriesList.find((c) => c.id === activeCategory);
+    if (found) return found.label;
     if (activeCategory === "buddha") return "Buddha Statues";
     if (activeCategory === "hindu") return "Hindu Statues";
     return "Our Complete Collection";
@@ -132,6 +173,8 @@ Could you please share pricing and availability?`;
     if (isFeaturedOnly) {
       return "Curated antique brass highlights across our Buddha and Hindu devotional collections. Explore bespoke finishes, authentic lost-wax artistry, and heirloom sizes.";
     }
+    const found = categoriesList.find((c) => c.id === activeCategory);
+    if (found && found.description) return found.description;
     if (activeCategory === "buddha") {
       return "Authentic lost-wax antique brass Buddha sculptures extracted directly from the official Advaita Tattva brochure.";
     }
@@ -141,8 +184,6 @@ Could you please share pricing and availability?`;
     return "Explore our handcrafted antique brass idols, thoughtfully created to bring timeless artistry and spiritual elegance into your space.";
   };
 
-  const buddhaCount = siteConfig.products.filter((p) => p.category === "buddha").length;
-  const hinduCount = siteConfig.products.filter((p) => p.category === "hindu").length;
   const HeadingTag = headingLevel;
 
   return (
@@ -193,7 +234,7 @@ Could you please share pricing and availability?`;
         )}
       </div>
 
-      {/* Category Pills (All Products, Buddha Statues, Hindu Statues) */}
+      {/* Category Pills (Dynamic from categoriesList) */}
       {!isFeaturedOnly && (
         <div className="flex flex-wrap items-center gap-2.5 mb-10 pb-4 border-b border-[#E7E0D4]">
           <button
@@ -205,32 +246,27 @@ Could you please share pricing and availability?`;
                 : "bg-white text-[#44403C] border border-[#E7E0D4] hover:border-[#B38A38] hover:text-[#1C1917]"
             }`}
           >
-            All Products <span className="opacity-70 text-[10px]">({siteConfig.products.length})</span>
+            All Products <span className="opacity-70 text-[10px]">({productsList.length})</span>
           </button>
 
-          <button
-            type="button"
-            onClick={() => handleCategoryChange("buddha")}
-            className={`px-4 py-2.5 rounded-full text-xs font-medium tracking-wider uppercase transition-all duration-200 cursor-pointer ${
-              activeCategory === "buddha"
-                ? "bg-[#1C1917] text-white shadow-xs ring-2 ring-[#B38A38]/30"
-                : "bg-white text-[#44403C] border border-[#E7E0D4] hover:border-[#B38A38] hover:text-[#1C1917]"
-            }`}
-          >
-            Buddha Statues <span className="opacity-70 text-[10px]">({buddhaCount})</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleCategoryChange("hindu")}
-            className={`px-4 py-2.5 rounded-full text-xs font-medium tracking-wider uppercase transition-all duration-200 cursor-pointer ${
-              activeCategory === "hindu"
-                ? "bg-[#1C1917] text-white shadow-xs ring-2 ring-[#B38A38]/30"
-                : "bg-white text-[#44403C] border border-[#E7E0D4] hover:border-[#B38A38] hover:text-[#1C1917]"
-            }`}
-          >
-            Hindu Statues <span className="opacity-70 text-[10px]">({hinduCount})</span>
-          </button>
+          {categoriesList.map((cat) => {
+            const count = productsList.filter((p) => p.category === cat.id).length;
+            const isSelected = activeCategory === cat.id;
+            return (
+              <button
+                key={cat.id}
+                type="button"
+                onClick={() => handleCategoryChange(cat.id as ProductCategory)}
+                className={`px-4 py-2.5 rounded-full text-xs font-medium tracking-wider uppercase transition-all duration-200 cursor-pointer ${
+                  isSelected
+                    ? "bg-[#1C1917] text-white shadow-xs ring-2 ring-[#B38A38]/30"
+                    : "bg-white text-[#44403C] border border-[#E7E0D4] hover:border-[#B38A38] hover:text-[#1C1917]"
+                }`}
+              >
+                {cat.label} <span className="opacity-70 text-[10px]">({count})</span>
+              </button>
+            );
+          })}
 
           {activeCategory !== "all" && (
             <button

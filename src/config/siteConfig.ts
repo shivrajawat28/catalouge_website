@@ -1,4 +1,4 @@
-export type ProductCategory = "all" | "buddha" | "hindu";
+export type ProductCategory = "all" | "buddha" | "hindu" | string;
 
 export interface ProductSizeOption {
   height: string;
@@ -10,8 +10,8 @@ export interface ProductItem {
   name: string;
   title: string; // for compatibility with existing components
   subtitle: string;
-  category: "buddha" | "hindu";
-  categoryLabel: "Buddha Statues" | "Hindu Statues";
+  category: "buddha" | "hindu" | string;
+  categoryLabel: "Buddha Statues" | "Hindu Statues" | string;
   tagline: string;
   dimension: string;
   material: string;

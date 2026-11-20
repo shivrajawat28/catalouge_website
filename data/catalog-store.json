@@ -1,0 +1,929 @@
+{
+  "categories": [
+    {
+      "id": "buddha",
+      "label": "Buddha Statues",
+      "description": "Authentic lost-wax antique brass Buddha sculptures extracted directly from the official Advaita Tattva brochure.",
+      "isCustom": false
+    },
+    {
+      "id": "hindu",
+      "label": "Hindu Statues",
+      "description": "Sacred Hindu deities and devotional idols for home, puja space, and thoughtful gifting from the Advaita Tattva brochure.",
+      "isCustom": false
+    }
+  ],
+  "products": [
+    {
+      "id": "seated-buddha",
+      "name": "Seated Buddha",
+      "title": "Seated Buddha",
+      "subtitle": "Dhyana Mudra Meditative Contemplation",
+      "category": "buddha",
+      "categoryLabel": "Buddha Statues",
+      "tagline": "A timeless devotional accent for your home, puja space, or thoughtful gifting.",
+      "dimension": "4.5 inch, 6 inch, 8 inch",
+      "material": "Solid Antique Brass (Lost-Wax Cast)",
+      "weight": "186 g to 330 g",
+      "availableSizes": [
+        {
+          "height": "4.5 inch",
+          "weight": "186 g"
+        },
+        {
+          "height": "6 inch",
+          "weight": "240 g"
+        },
+        {
+          "height": "8 inch",
+          "weight": "330 g"
+        }
+      ],
+      "description": "A timeless devotional accent for your home, puja space, or thoughtful gifting. Gautama Buddha seated in deep padmasana meditation upon an engraved rectangular pedestal with monastic robes.",
+      "image": "/products/seated-buddha.jpg",
+      "sourcePage": 4,
+      "code": "AT-BUD-04",
+      "featured": true
+    },
+    {
+      "id": "buddha-bodhi-tree",
+      "name": "Buddha under Bodhi Tree",
+      "title": "Buddha under Bodhi Tree",
+      "subtitle": "Enlightenment Tableau with Spreading Canopy",
+      "category": "buddha",
+      "categoryLabel": "Buddha Statues",
+      "tagline": "A timeless devotional accent for your home, puja space, or thoughtful gifting.",
+      "dimension": "6 inch, 8 inch, 12 inch",
+      "material": "Solid Antique Brass (Lost-Wax Cast)",
+      "weight": "249 g to 787 g",
+      "availableSizes": [
+        {
+          "height": "6 inch",
+          "weight": "249 g"
+        },
+        {
+          "height": "8 inch",
+          "weight": "389 g"
+        },
+        {
+          "height": "12 inch",
+          "weight": "787 g"
+        }
+      ],
+      "description": "A timeless devotional accent for your home, puja space, or thoughtful gifting. Majestic sculpture of Buddha seated beneath the radiating foliage of the sacred Bodhi Tree adorned with perched songbirds.",
+      "image": "/products/buddha-bodhi-tree.jpg",
+      "sourcePage": 5,
+      "code": "AT-BUD-05",
+      "featured": true
+    },
+    {
+      "id": "buddha-in-hand",
+      "name": "Buddha in Hand",
+      "title": "Buddha in Hand",
+      "subtitle": "A Serene Symbol of Wisdom, Compassion & Inner Peace",
+      "category": "buddha",
+      "categoryLabel": "Buddha Statues",
+      "tagline": "A serene symbol of wisdom, compassion, and inner peace.",
+      "dimension": "6 inch, 8 inch",
+      "material": "Solid Antique Brass (Lost-Wax Cast)",
+      "weight": "442 g to 732 g",
+      "availableSizes": [
+        {
+          "height": "6 inch",
+          "weight": "442 g"
+        },
+        {
+          "height": "8 inch",
+          "weight": "732 g"
+        }
+      ],
+      "description": "A serene symbol of wisdom, compassion, and inner peace. Delicate sculpture of Buddha seated gracefully within the open palm of the benevolent blessing hand.",
+      "image": "/products/buddha-in-hand.jpg",
+      "sourcePage": 15,
+      "code": "AT-BUD-15",
+      "featured": false
+    },
+    {
+      "id": "twin-buddha",
+      "name": "Twin Seated Buddha Idols",
+      "title": "Twin Seated Buddha Idols",
+      "subtitle": "Peace, Mindfulness & Inner Harmony Pair",
+      "category": "buddha",
+      "categoryLabel": "Buddha Statues",
+      "tagline": "A serene expression of peace, mindfulness, and inner harmony for your home or meditation space.",
+      "dimension": "2 inch, 3 inch",
+      "material": "Solid Antique Brass (Lost-Wax Cast)",
+      "weight": "80 g to 104 g",
+      "availableSizes": [
+        {
+          "height": "2 inch",
+          "weight": "80 g"
+        },
+        {
+          "height": "3 inch",
+          "weight": "104 g"
+        }
+      ],
+      "description": "A serene expression of peace, mindfulness, and inner harmony for your home or meditation space. Twin finely detailed brass Buddha idols in tranquil contemplation.",
+      "image": "/products/twin-buddha.jpg",
+      "sourcePage": 17,
+      "code": "AT-BUD-17",
+      "featured": false
+    },
+    {
+      "id": "lord-buddha",
+      "name": "Lord Buddha",
+      "title": "Lord Buddha",
+      "subtitle": "The Giver of Peace & Enlightenment",
+      "category": "buddha",
+      "categoryLabel": "Buddha Statues",
+      "tagline": "The divine embodiment of peace, inner calm and enlightenment.",
+      "dimension": "3 inch, 6 inch",
+      "material": "Solid Antique Brass (Lost-Wax Cast)",
+      "weight": "142 g to 322 g",
+      "availableSizes": [
+        {
+          "height": "3 inch",
+          "weight": "142 g"
+        },
+        {
+          "height": "6 inch",
+          "weight": "322 g"
+        }
+      ],
+      "description": "Gautama Buddha, the divine embodiment of peace, inner calm and enlightenment, inspires us to seek truth, bring mindfulness to our lives, and light up our spiritual path.",
+      "image": "/products/lord-buddha.jpg",
+      "sourcePage": 10,
+      "code": "AT-BUD-PEA10",
+      "featured": false
+    },
+    {
+      "id": "lord-ganesha",
+      "name": "Lord Ganesha",
+      "title": "Lord Ganesha",
+      "subtitle": "Seated Vinayaka on Lotus Dais",
+      "category": "hindu",
+      "categoryLabel": "Hindu Statues",
+      "tagline": "A timeless devotional accent for your home, puja space, or thoughtful gifting.",
+      "dimension": "4 inch, 6 inch, 8 inch",
+      "material": "Solid Antique Brass (Lost-Wax Cast)",
+      "weight": "180 g to 322 g",
+      "availableSizes": [
+        {
+          "height": "4 inch",
+          "weight": "180 g"
+        },
+        {
+          "height": "6 inch",
+          "weight": "244 g"
+        },
+        {
+          "height": "8 inch",
+          "weight": "322 g"
+        }
+      ],
+      "description": "A timeless devotional accent for your home, puja space, or thoughtful gifting. Seated Lord Ganesha on an ornate lotus pedestal with modaka and abhaya blessing mudra.",
+      "image": "/products/lord-ganesha.jpg",
+      "sourcePage": 1,
+      "code": "AT-HIN-01",
+      "featured": true
+    },
+    {
+      "id": "maa-durga",
+      "name": "Maa Durga",
+      "title": "Maa Durga",
+      "subtitle": "Goddess Durga Riding the Lion",
+      "category": "hindu",
+      "categoryLabel": "Hindu Statues",
+      "tagline": "A timeless devotional accent for your home, puja space, or thoughtful gifting.",
+      "dimension": "4 inch, 6 inch, 8 inch",
+      "material": "Solid Antique Brass (Lost-Wax Cast)",
+      "weight": "183 g to 328 g",
+      "availableSizes": [
+        {
+          "height": "4 inch",
+          "weight": "183 g"
+        },
+        {
+          "height": "6 inch",
+          "weight": "249 g"
+        },
+        {
+          "height": "8 inch",
+          "weight": "328 g"
+        }
+      ],
+      "description": "A timeless devotional accent for your home, puja space, or thoughtful gifting. Ten-armed Goddess Durga poised in majesty atop the sacred lion, bearing traditional divine weapons.",
+      "image": "/products/maa-durga.jpg",
+      "sourcePage": 2,
+      "code": "AT-HIN-02",
+      "featured": false
+    },
+    {
+      "id": "maa-lakshmi",
+      "name": "Maa Lakshmi",
+      "title": "Maa Lakshmi",
+      "subtitle": "Goddess of Wealth & Prosperity on Lotus",
+      "category": "hindu",
+      "categoryLabel": "Hindu Statues",
+      "tagline": "A timeless devotional accent for your home, puja space, or thoughtful gifting.",
+      "dimension": "4 inch, 6 inch, 8 inch",
+      "material": "Solid Antique Brass (Lost-Wax Cast)",
+      "weight": "177 g to 319 g",
+      "availableSizes": [
+        {
+          "height": "4 inch",
+          "weight": "177 g"
+        },
+        {
+          "height": "6 inch",
+          "weight": "241 g"
+        },
+        {
+          "height": "8 inch",
+          "weight": "319 g"
+        }
+      ],
+      "description": "A timeless devotional accent for your home, puja space, or thoughtful gifting. Four-armed Mother Lakshmi seated upon a blooming lotus flower, holding lotus blossoms and bestowing blessings.",
+      "image": "/products/maa-lakshmi.jpg",
+      "sourcePage": 3,
+      "code": "AT-HIN-03",
+      "featured": false
+    },
+    {
+      "id": "laddu-gopal",
+      "name": "Laddu Gopal",
+      "title": "Laddu Gopal",
+      "subtitle": "Infant Krishna with Makhan/Butter Ball",
+      "category": "hindu",
+      "categoryLabel": "Hindu Statues",
+      "tagline": "A timeless devotional accent for your home, puja space, or thoughtful gifting.",
+      "dimension": "3 inch, 6 inch",
+      "material": "Solid Antique Brass (Lost-Wax Cast)",
+      "weight": "104 g to 189 g",
+      "availableSizes": [
+        {
+          "height": "3 inch",
+          "weight": "104 g"
+        },
+        {
+          "height": "6 inch",
+          "weight": "189 g"
+        }
+      ],
+      "description": "A timeless devotional accent for your home, puja space, or thoughtful gifting. Playful crawling Bala Krishna holding the sweet butter ball, adorned with peacock crest and sacred ornaments.",
+      "image": "/products/laddu-gopal.jpg",
+      "sourcePage": 6,
+      "code": "AT-HIN-06",
+      "featured": false
+    },
+    {
+      "id": "shivling",
+      "name": "Shivling",
+      "title": "Shivling",
+      "subtitle": "Sacred Shivalingam with Sheshnag & Nandi",
+      "category": "hindu",
+      "categoryLabel": "Hindu Statues",
+      "tagline": "A timeless devotional accent for your home, puja space, or thoughtful gifting.",
+      "dimension": "2 inch, 3 inch",
+      "material": "Polished Antique Brass (Lost-Wax Cast)",
+      "weight": "60 g to 96 g",
+      "availableSizes": [
+        {
+          "height": "2 inch",
+          "weight": "60 g"
+        },
+        {
+          "height": "3 inch",
+          "weight": "96 g"
+        }
+      ],
+      "description": "A timeless devotional accent for your home, puja space, or thoughtful gifting. Sacred brass Shivalingam mounted upon a carved yoni base with protective Sheshnag cobra hood and faithful Nandi.",
+      "image": "/products/shivling.jpg",
+      "sourcePage": 7,
+      "code": "AT-HIN-07",
+      "featured": false
+    },
+    {
+      "id": "maa-saraswati",
+      "name": "Maa Saraswati",
+      "title": "Maa Saraswati",
+      "subtitle": "The Giver of Wisdom & Knowledge",
+      "category": "hindu",
+      "categoryLabel": "Hindu Statues",
+      "tagline": "The divine embodiment of wisdom, art and knowledge.",
+      "dimension": "3 inch, 6 inch",
+      "material": "Solid Antique Brass (Lost-Wax Cast)",
+      "weight": "109 g to 187 g",
+      "availableSizes": [
+        {
+          "height": "3 inch",
+          "weight": "109 g"
+        },
+        {
+          "height": "6 inch",
+          "weight": "187 g"
+        }
+      ],
+      "description": "Maa Saraswati, the divine embodiment of wisdom, art and knowledge, inspires us to seek truth, bring clarity to our minds and light up our inner world.",
+      "image": "/products/maa-saraswati.jpg",
+      "sourcePage": 8,
+      "code": "AT-HIN-08",
+      "featured": false
+    },
+    {
+      "id": "maa-lakshmi-seated",
+      "name": "Maa Lakshmi (Kamalasan)",
+      "title": "Maa Lakshmi (Kamalasan)",
+      "subtitle": "Kamalasan Seated Goddess of Grace & Fortune",
+      "category": "hindu",
+      "categoryLabel": "Hindu Statues",
+      "tagline": "A timeless devotional accent for your home, puja space, or thoughtful gifting.",
+      "dimension": "3 inch, 6 inch",
+      "material": "Solid Antique Brass (Lost-Wax Cast)",
+      "weight": "104 g to 180 g",
+      "availableSizes": [
+        {
+          "height": "3 inch",
+          "weight": "104 g"
+        },
+        {
+          "height": "6 inch",
+          "weight": "180 g"
+        }
+      ],
+      "description": "A timeless devotional accent for your home, puja space, or thoughtful gifting. Graceful compact form of Mother Lakshmi seated in padmasana upon the blooming lotus throne.",
+      "image": "/products/maa-lakshmi-seated.jpg",
+      "sourcePage": 9,
+      "code": "AT-HIN-09",
+      "featured": false
+    },
+    {
+      "id": "lord-hanuman",
+      "name": "Lord Hanuman",
+      "title": "Lord Hanuman",
+      "subtitle": "Sankat Mochan Mahabali Hanuman",
+      "category": "hindu",
+      "categoryLabel": "Hindu Statues",
+      "tagline": "A timeless devotional accent for your home, puja space, or thoughtful gifting.",
+      "dimension": "2 inch, 2.5 inch, 3 inch",
+      "material": "Solid Antique Brass (Lost-Wax Cast)",
+      "weight": "60 g to 200 g",
+      "availableSizes": [
+        {
+          "height": "2 inch (Small)",
+          "weight": "60 g"
+        },
+        {
+          "height": "2.5 inch (Medium)",
+          "weight": "100 g"
+        },
+        {
+          "height": "3 inch (Large)",
+          "weight": "200 g"
+        }
+      ],
+      "description": "A timeless devotional accent for your home, puja space, or thoughtful gifting. Revered idol of Lord Hanuman embodying absolute devotion, spiritual strength, and protective grace.",
+      "image": "/products/lord-hanuman.jpg",
+      "sourcePage": 10,
+      "code": "AT-HIN-10",
+      "featured": false
+    },
+    {
+      "id": "shiv-parivar",
+      "name": "Shiv Parivar",
+      "title": "Shiv Parivar",
+      "subtitle": "Lord Shiva, Mata Parvati, Ganesha & Kartikeya",
+      "category": "hindu",
+      "categoryLabel": "Hindu Statues",
+      "tagline": "A timeless devotional accent for your home, puja space, or thoughtful gifting.",
+      "dimension": "4 inch, 6 inch",
+      "material": "Solid Antique Brass (Lost-Wax Cast)",
+      "weight": "580 g to 900 g",
+      "availableSizes": [
+        {
+          "height": "4 inch",
+          "weight": "580 g"
+        },
+        {
+          "height": "6 inch",
+          "weight": "900 g"
+        }
+      ],
+      "description": "A timeless devotional accent for your home, puja space, or thoughtful gifting. Holy ensemble of Lord Shiva, Goddess Parvati, baby Ganesha, and Kartikeya seated in divine familial unity.",
+      "image": "/products/shiv-parivar.jpg",
+      "sourcePage": 11,
+      "code": "AT-HIN-11",
+      "featured": true
+    },
+    {
+      "id": "lakshmi-ganesha",
+      "name": "Maa Lakshmi & Lord Ganesha",
+      "title": "Maa Lakshmi & Lord Ganesha",
+      "subtitle": "Shubh Labh Classic Auspicious Pair",
+      "category": "hindu",
+      "categoryLabel": "Hindu Statues",
+      "tagline": "A timeless devotional accent for your home, puja space, or thoughtful gifting.",
+      "dimension": "3 inch, 6 inch",
+      "material": "Solid Antique Brass (Lost-Wax Cast)",
+      "weight": "400 g to 850 g",
+      "availableSizes": [
+        {
+          "height": "3 inch",
+          "weight": "400 g"
+        },
+        {
+          "height": "6 inch",
+          "weight": "850 g"
+        }
+      ],
+      "description": "A timeless devotional accent for your home, puja space, or thoughtful gifting. Auspicious Shubh-Labh pairing of Mother Lakshmi and Lord Ganesha seated on traditional brass plinths.",
+      "image": "/products/lakshmi-ganesha.jpg",
+      "sourcePage": 12,
+      "code": "AT-HIN-12",
+      "featured": false
+    },
+    {
+      "id": "lakshmi-ganesha-ornate",
+      "name": "Maa Lakshmi & Lord Ganesha (Ornate Arch)",
+      "title": "Maa Lakshmi & Lord Ganesha (Ornate Arch)",
+      "subtitle": "Ornate Prabhavali & Diya Auspicious Pair",
+      "category": "hindu",
+      "categoryLabel": "Hindu Statues",
+      "tagline": "A timeless devotional accent for your home, puja space, or thoughtful gifting.",
+      "dimension": "3 inch, 6 inch",
+      "material": "Solid Antique Brass (Lost-Wax Cast)",
+      "weight": "410 g to 867 g",
+      "availableSizes": [
+        {
+          "height": "3 inch",
+          "weight": "410 g"
+        },
+        {
+          "height": "6 inch",
+          "weight": "867 g"
+        }
+      ],
+      "description": "A timeless devotional accent for your home, puja space, or thoughtful gifting. Ornate festive edition with integrated prabhavali halos and auspicious diya oil lamp motifs.",
+      "image": "/products/lakshmi-ganesha-ornate.jpg",
+      "sourcePage": 13,
+      "code": "AT-HIN-13",
+      "featured": false
+    },
+    {
+      "id": "krishna-cow",
+      "name": "Lord Krishna with Cow",
+      "title": "Lord Krishna with Cow",
+      "subtitle": "A Divine Symbol of Love, Compassion & Harmony",
+      "category": "hindu",
+      "categoryLabel": "Hindu Statues",
+      "tagline": "A divine symbol of love, compassion, and eternal harmony.",
+      "dimension": "4 inch, 9 inch",
+      "material": "Solid Antique Brass (Lost-Wax Cast)",
+      "weight": "242 g to 700 g",
+      "availableSizes": [
+        {
+          "height": "4 inch",
+          "weight": "242 g"
+        },
+        {
+          "height": "9 inch",
+          "weight": "700 g"
+        }
+      ],
+      "description": "A divine symbol of love, compassion, and eternal harmony. Graceful tribhanga posture of Lord Krishna playing the bansuri flute with Kamadhenu cow listening in adoration.",
+      "image": "/products/krishna-cow.jpg",
+      "sourcePage": 14,
+      "code": "AT-HIN-14",
+      "featured": true
+    },
+    {
+      "id": "panchmukhi-hanuman",
+      "name": "Panchmukhi Hanuman Ji",
+      "title": "Panchmukhi Hanuman Ji",
+      "subtitle": "A Divine Symbol of Strength, Devotion & Protection",
+      "category": "hindu",
+      "categoryLabel": "Hindu Statues",
+      "tagline": "A divine symbol of strength, devotion, courage, and protection.",
+      "dimension": "6 inch, 9 inch",
+      "material": "Solid Antique Brass (Lost-Wax Cast)",
+      "weight": "552 g to 900 g",
+      "availableSizes": [
+        {
+          "height": "6 inch",
+          "weight": "552 g"
+        },
+        {
+          "height": "9 inch",
+          "weight": "900 g"
+        }
+      ],
+      "description": "A divine symbol of strength, devotion, courage, and protection. Five-faced manifestation of Lord Hanuman bearing traditional celestial armaments and victorious posture.",
+      "image": "/products/panchmukhi-hanuman.jpg",
+      "sourcePage": 16,
+      "code": "AT-HIN-16",
+      "featured": false
+    },
+    {
+      "id": "standing-hanuman",
+      "name": "Standing Hanuman Ji",
+      "title": "Standing Hanuman Ji",
+      "subtitle": "Heroic Stance with Gada & Sanjeevani Mountain",
+      "category": "hindu",
+      "categoryLabel": "Hindu Statues",
+      "tagline": "A divine symbol of strength, devotion, courage, and protection.",
+      "dimension": "6 inch, 9 inch",
+      "material": "Solid Antique Brass (Lost-Wax Cast)",
+      "weight": "604 g to 962 g",
+      "availableSizes": [
+        {
+          "height": "6 inch",
+          "weight": "604 g"
+        },
+        {
+          "height": "9 inch",
+          "weight": "962 g"
+        }
+      ],
+      "description": "A divine symbol of strength, devotion, courage, and protection. Majestic standing stance of Lord Hanuman holding his mighty mace (gada) and lifting the divine Sanjeevani mountain.",
+      "image": "/products/standing-hanuman.jpg",
+      "sourcePage": 18,
+      "code": "AT-HIN-18",
+      "featured": false
+    },
+    {
+      "id": "lord-shiva",
+      "name": "Lord Shiva",
+      "title": "Lord Shiva",
+      "subtitle": "A Divine Symbol of Meditation, Strength & Peace",
+      "category": "hindu",
+      "categoryLabel": "Hindu Statues",
+      "tagline": "A divine symbol of meditation, strength, and inner peace.",
+      "dimension": "6 inch, 9 inch",
+      "material": "Solid Antique Brass (Lost-Wax Cast)",
+      "weight": "502 g to 852 g",
+      "availableSizes": [
+        {
+          "height": "6 inch",
+          "weight": "502 g"
+        },
+        {
+          "height": "9 inch",
+          "weight": "852 g"
+        }
+      ],
+      "description": "A divine symbol of meditation, strength, and inner peace. Contemplative Lord Shiva seated in deep samadhi meditation with crescent moon, trishula, and damru.",
+      "image": "/products/lord-shiva.jpg",
+      "sourcePage": 19,
+      "code": "AT-HIN-19",
+      "featured": false
+    },
+    {
+      "id": "lord-rama",
+      "name": "Lord Rama",
+      "title": "Lord Rama",
+      "subtitle": "A Divine Symbol of Virtue, Courage & Righteousness",
+      "category": "hindu",
+      "categoryLabel": "Hindu Statues",
+      "tagline": "A divine symbol of virtue, courage, and righteousness.",
+      "dimension": "6 inch, 9 inch",
+      "material": "Solid Antique Brass (Lost-Wax Cast)",
+      "weight": "599 g to 942 g",
+      "availableSizes": [
+        {
+          "height": "6 inch",
+          "weight": "599 g"
+        },
+        {
+          "height": "9 inch",
+          "weight": "942 g"
+        }
+      ],
+      "description": "A divine symbol of virtue, courage, and righteousness. Maryada Purushottam Lord Rama poised with the Kodanda bow, representing dharma and noble grace.",
+      "image": "/products/lord-rama.jpg",
+      "sourcePage": 20,
+      "code": "AT-HIN-20",
+      "featured": false
+    },
+    {
+      "id": "nandi-ji",
+      "name": "Nandi Ji",
+      "title": "Nandi Ji",
+      "subtitle": "A Sacred Symbol of Devotion, Strength & Faith",
+      "category": "hindu",
+      "categoryLabel": "Hindu Statues",
+      "tagline": "A sacred symbol of devotion, strength, and unwavering faith.",
+      "dimension": "3 inch, 4 inch",
+      "material": "Solid Antique Brass (Lost-Wax Cast)",
+      "weight": "142 g to 202 g",
+      "availableSizes": [
+        {
+          "height": "3 inch",
+          "weight": "142 g"
+        },
+        {
+          "height": "4 inch",
+          "weight": "202 g"
+        }
+      ],
+      "description": "A sacred symbol of devotion, strength, and unwavering faith. Seated sacred bull Nandi adorned with festive bells, saddle drapery, and attentive devotion toward Lord Shiva.",
+      "image": "/products/nandi-ji.jpg",
+      "sourcePage": 21,
+      "code": "AT-HIN-21",
+      "featured": false
+    },
+    {
+      "id": "tara-devi",
+      "name": "Goddess Idol (Tara Devi Ji)",
+      "title": "Goddess Idol (Tara Devi Ji)",
+      "subtitle": "Grace, Wisdom & Spiritual Abundance",
+      "category": "hindu",
+      "categoryLabel": "Hindu Statues",
+      "tagline": "A divine symbol of grace, wisdom, and spiritual abundance.",
+      "dimension": "6 inch, 8 inch",
+      "material": "Solid Antique Brass (Lost-Wax Cast)",
+      "weight": "592 g to 728 g",
+      "availableSizes": [
+        {
+          "height": "6 inch",
+          "weight": "592 g"
+        },
+        {
+          "height": "8 inch",
+          "weight": "728 g"
+        }
+      ],
+      "description": "A divine symbol of grace, wisdom, and spiritual abundance. Intricately rendered goddess idol representing Tara Devi, embodying compassionate deliverance and motherly protection.",
+      "image": "/products/tara-devi.jpg",
+      "sourcePage": 22,
+      "code": "AT-HIN-22",
+      "featured": false
+    },
+    {
+      "id": "lord-kubera",
+      "name": "Lord Kubera",
+      "title": "Lord Kubera",
+      "subtitle": "The Bestower of Prosperity & Abundance",
+      "category": "hindu",
+      "categoryLabel": "Hindu Statues",
+      "tagline": "The divine guardian of wealth, blessing prosperity and financial stability.",
+      "dimension": "2.5 inch, 3.25 inch, 4.25 inch",
+      "material": "Solid Antique Brass (Lost-Wax Cast)",
+      "weight": "95 g to 250 g",
+      "availableSizes": [
+        {
+          "height": "2.5 inch",
+          "weight": "95 g"
+        },
+        {
+          "height": "3.25 inch",
+          "weight": "160 g"
+        },
+        {
+          "height": "4.25 inch",
+          "weight": "250 g"
+        }
+      ],
+      "description": "Lord Kubera, the divine guardian of wealth, blesses us with prosperity, financial stability and abundance, reminding us that true wealth lies in gratitude, balance and a generous heart.",
+      "image": "/products/lord-kubera.jpg",
+      "sourcePage": 9,
+      "code": "AT-HIN-KUB09",
+      "featured": false
+    },
+    {
+      "id": "brass-tortoise-idols",
+      "name": "Brass Tortoise Idols",
+      "title": "Brass Tortoise Idols",
+      "subtitle": "A Traditional Symbol of Longevity, Stability & Auspiciousness",
+      "category": "hindu",
+      "categoryLabel": "Hindu Statues",
+      "tagline": "A traditional symbol of longevity, stability, and auspiciousness.",
+      "dimension": "2 inch, 3 inch, 4.5 inch",
+      "material": "Solid Antique Brass (Lost-Wax Cast)",
+      "weight": "122 g to 440 g",
+      "availableSizes": [
+        {
+          "height": "2 inch",
+          "weight": "122 g"
+        },
+        {
+          "height": "3 inch",
+          "weight": "262 g"
+        },
+        {
+          "height": "4.5 inch",
+          "weight": "440 g"
+        }
+      ],
+      "description": "A traditional symbol of longevity, stability, and auspiciousness. Sacred brass Kurma tortoise idols featuring intricately carved shell plates engraved with auspicious deity motifs and Sri Yantra emblems.",
+      "image": "/products/brass-tortoise-idols.jpg",
+      "sourcePage": 23,
+      "code": "AT-HIN-23",
+      "featured": false
+    },
+    {
+      "id": "brass-elephant-idols",
+      "name": "Brass Elephant Idols",
+      "title": "Brass Elephant Idols",
+      "subtitle": "A Timeless Symbol of Wisdom, Strength & Prosperity",
+      "category": "hindu",
+      "categoryLabel": "Hindu Statues",
+      "tagline": "A timeless symbol of wisdom, strength, prosperity, and good fortune.",
+      "dimension": "2 inch, 3 inch, 4 inch",
+      "material": "Solid Antique Brass (Lost-Wax Cast)",
+      "weight": "120 g to 380 g",
+      "availableSizes": [
+        {
+          "height": "2 inch",
+          "weight": "120 g"
+        },
+        {
+          "height": "3 inch",
+          "weight": "240 g"
+        },
+        {
+          "height": "4 inch",
+          "weight": "380 g"
+        }
+      ],
+      "description": "A timeless symbol of wisdom, strength, prosperity, and good fortune. Trio of ceremonial brass elephants adorned with traditional engraved royal saddle drapery, ornate headgear, and raised trunks.",
+      "image": "/products/brass-elephant-idols.jpg",
+      "sourcePage": 24,
+      "code": "AT-HIN-24",
+      "featured": false
+    },
+    {
+      "id": "radha-krishna",
+      "name": "Radha Krishna",
+      "title": "Radha Krishna",
+      "subtitle": "A Timeless Symbol of Divine Love, Devotion & Harmony",
+      "category": "hindu",
+      "categoryLabel": "Hindu Statues",
+      "tagline": "A timeless symbol of divine love, devotion, and harmony.",
+      "dimension": "4 inch, 6 inch, 9 inch",
+      "material": "Solid Antique Brass (Lost-Wax Cast)",
+      "weight": "230 g to 950 g",
+      "availableSizes": [
+        {
+          "height": "4 inch",
+          "weight": "230 g"
+        },
+        {
+          "height": "6 inch",
+          "weight": "440 g"
+        },
+        {
+          "height": "9 inch",
+          "weight": "950 g"
+        }
+      ],
+      "description": "A timeless symbol of divine love, devotion, and harmony. Exquisitely handcrafted brass idol depicting Lord Krishna playing the divine flute alongside Radha Rani in eternal celestial grace.",
+      "image": "/products/radha-krishna.jpg",
+      "sourcePage": 26,
+      "code": "AT-HIN-26",
+      "featured": false
+    },
+    {
+      "id": "vishnu-charan-paduka",
+      "name": "Vishnu Charan Paduka",
+      "title": "Vishnu Charan Paduka",
+      "subtitle": "A Sacred Symbol of Devotion, Grace & Lord Vishnu's Presence",
+      "category": "hindu",
+      "categoryLabel": "Hindu Statues",
+      "tagline": "A sacred symbol of devotion, grace, and the divine presence of Lord Vishnu.",
+      "dimension": "2 inch, 3 inch",
+      "material": "Solid Antique Brass (Lost-Wax Cast)",
+      "weight": "102 g to 140 g",
+      "availableSizes": [
+        {
+          "height": "2 inch",
+          "weight": "102 g"
+        },
+        {
+          "height": "3 inch",
+          "weight": "140 g"
+        }
+      ],
+      "description": "A sacred symbol of devotion, grace, and the divine presence of Lord Vishnu. Intricately sculpted brass Charan Paduka embellished with sacred Vaishnava symbols including the Shankha, Chakra, and Urdhva Pundra tilak.",
+      "image": "/products/vishnu-charan-paduka.jpg",
+      "sourcePage": 27,
+      "code": "AT-HIN-27",
+      "featured": false
+    }
+  ],
+  "videos": [
+    {
+      "id": "muchalinda-buddha-wax-brass",
+      "src": "WhatsApp Video 2026-11-10 at 17.14.54.mp4",
+      "title": "Muchalinda Buddha — Lost-Wax Prototype",
+      "description": "From sculptural wax master to cast antique brass, capturing fine Serpent canopy details.",
+      "poster": "posters/poster-01.jpg",
+      "aspectRatio": "portrait"
+    },
+    {
+      "id": "hanuman-chawki-plinth",
+      "src": "WhatsApp Video 2026-11-10 at 17.14.55.mp4",
+      "title": "Seated Lord Hanuman on Carved Plinth",
+      "description": "Hand-finished antique brass Hanuman with gada resting on an engraved chawki dais.",
+      "poster": "posters/poster-02.jpg",
+      "aspectRatio": "portrait"
+    },
+    {
+      "id": "elephant-diya-oil-lamp",
+      "src": "WhatsApp Video 2026-11-10 at 17.15.04.mp4",
+      "title": "Carved Elephant Diya Oil Lamps",
+      "description": "Pair of traditional brass elephant oil lamps with ornamental floral and temple motifs.",
+      "poster": "posters/poster-03.jpg",
+      "aspectRatio": "portrait"
+    },
+    {
+      "id": "jagannath-trio-brass",
+      "src": "WhatsApp Video 2026-11-10 at 17.15.11.mp4",
+      "title": "Lord Jagannath, Balabhadra & Subhadra Trio",
+      "description": "Sacred Puri triad in solid antique brass with crisp facial detailing and arched framing.",
+      "poster": "posters/poster-04.jpg",
+      "aspectRatio": "portrait"
+    },
+    {
+      "id": "nandi-ji-ornate-pedestal",
+      "src": "WhatsApp Video 2026-11-10 at 17.15.13.mp4",
+      "title": "Ornate Nandi Ji on Carved Square Dais",
+      "description": "Close inspection of saddle drapery, ceremonial bells, and traditional lost-wax surface patina.",
+      "poster": "posters/poster-05.jpg",
+      "aspectRatio": "portrait"
+    },
+    {
+      "id": "maa-durga-lion-showcase",
+      "src": "WhatsApp Video 2026-11-10 at 17.15.28.mp4",
+      "title": "Ten-Armed Maa Durga on Lion",
+      "description": "Studio showcase rotating a deeply sculpted antique brass Maa Durga murti.",
+      "poster": "posters/poster-06.jpg",
+      "aspectRatio": "portrait"
+    },
+    {
+      "id": "seated-goddess-silver-finish",
+      "src": "WhatsApp Video 2026-11-10 at 17.15.29.mp4",
+      "title": "Seated Goddess with Sugarcane Bow & Lotus",
+      "description": "360-degree view highlighting lotus petal carving, crown work, and silver-toned finish.",
+      "poster": "posters/poster-07.jpg",
+      "aspectRatio": "portrait"
+    },
+    {
+      "id": "workshop-idols-floor-lineup",
+      "src": "WhatsApp Video 2026-11-10 at 17.15.39 (1).mp4",
+      "title": "Workshop Lineup of Finished Brass Idols",
+      "description": "Artisan studio view across fresh cast batches of seated deities prepared for finishing.",
+      "poster": "posters/poster-08.jpg",
+      "aspectRatio": "portrait"
+    },
+    {
+      "id": "studio-kamadhenu-collection",
+      "src": "WhatsApp Video 2026-11-10 at 17.15.39.mp4",
+      "title": "Kamadhenu & Brass Murti Studio Arrangement",
+      "description": "Wide table overview featuring sacred Kamadhenu cow alongside classic antique brass idols.",
+      "poster": "posters/poster-09.jpg",
+      "aspectRatio": "landscape"
+    },
+    {
+      "id": "kurma-tortoise-yantra-plates",
+      "src": "WhatsApp Video 2026-11-10 at 17.15.40 (1).mp4",
+      "title": "Engraved Brass Kurma & Yantra Reliefs",
+      "description": "Hand-etched auspicious tortoise and geometric yantra reliefs in aged brass patina.",
+      "poster": "posters/poster-10.jpg",
+      "aspectRatio": "portrait"
+    },
+    {
+      "id": "lord-ganesha-mushak-chawki",
+      "src": "WhatsApp Video 2026-11-10 at 17.15.40 (2).mp4",
+      "title": "Lord Ganesha with Mushak on Carved Plinth",
+      "description": "Four-armed Vignaharta Ganesha resting peacefully on an ornate brass pedestal with Mushak.",
+      "poster": "posters/poster-11.jpg",
+      "aspectRatio": "portrait"
+    },
+    {
+      "id": "engraved-elephant-deities-display",
+      "src": "WhatsApp Video 2026-11-10 at 17.15.40.mp4",
+      "title": "Engraved Brass Elephant & Deities Display",
+      "description": "Detailed studio pan showing chased elephant trappings and multi-figure brass ensemble.",
+      "poster": "posters/poster-12.jpg",
+      "aspectRatio": "landscape"
+    },
+    {
+      "id": "sheshshayi-vishnu-graduated-sizes",
+      "src": "WhatsApp Video 2026-11-10 at 17.15.41.mp4",
+      "title": "Sheshshayi Lord Vishnu — Graduated Sizes",
+      "description": "Side-by-side studio comparison of brass sculptures across multiple heirloom scales.",
+      "poster": "posters/poster-13.jpg",
+      "aspectRatio": "landscape"
+    },
+    {
+      "id": "lost-wax-casting-quenching",
+      "src": "lost-wax-casting-quenching.mp4",
+      "title": "Lost-Wax Casting & Water Quenching",
+      "description": "Master artisan retrieving freshly cast antique brass idol from the cooling bath, revealing raw intricate bronze details.",
+      "poster": "posters/poster-14.jpg",
+      "aspectRatio": "portrait"
+    }
+  ],
+  "updatedAt": "2026-11-20T16:34:10.003Z"
+}
