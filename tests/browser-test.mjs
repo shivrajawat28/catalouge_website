@@ -344,9 +344,9 @@ async function runTests() {
     );
     results.testD_category_separation.details.push(`Hindu category products (${hinduProductTitles.length}): ${JSON.stringify(hinduProductTitles)}`);
 
-    // Verify strict separation: must contain 19 Hindu idols and 0 Buddha statues
+    // Verify strict separation: must contain 23 Hindu idols and 0 Buddha statues
     const hasOnlyHindus =
-      hinduProductTitles.length === 19 &&
+      hinduProductTitles.length === 23 &&
       hinduProductTitles.includes("Lord Ganesha") &&
       hinduProductTitles.includes("Maa Durga") &&
       hinduProductTitles.includes("Maa Lakshmi") &&
@@ -359,6 +359,10 @@ async function runTests() {
       hinduProductTitles.includes("Lord Shiva") &&
       hinduProductTitles.includes("Lord Rama") &&
       hinduProductTitles.includes("Nandi Ji") &&
+      hinduProductTitles.includes("Radha Krishna") &&
+      hinduProductTitles.includes("Vishnu Charan Paduka") &&
+      hinduProductTitles.includes("Brass Elephant Idols") &&
+      hinduProductTitles.includes("Brass Tortoise Idols") &&
       !hinduProductTitles.some((t) => t.includes("Buddha"));
 
     results.testD_category_separation.details.push(`Hindu strict purity test: ${hasOnlyHindus}`);
@@ -378,14 +382,14 @@ async function runTests() {
     const allProductTitles = await page.$$eval("article h3", (elements) =>
       elements.map((el) => el.textContent.trim())
     );
-    results.testD_category_separation.details.push(`All Products count: ${allProductTitles.length} (Expected 24), header: ${JSON.stringify(productsHeaderAudit)}`);
+    results.testD_category_separation.details.push(`All Products count: ${allProductTitles.length} (Expected 28), header: ${JSON.stringify(productsHeaderAudit)}`);
     await page.screenshot({ path: path.join(OUTPUT_DIR, "desktop_1440_products_all.png"), fullPage: false });
 
     if (
       homeFeaturedValid &&
       hasOnlyBuddhas &&
       hasOnlyHindus &&
-      allProductTitles.length === 24 &&
+      allProductTitles.length === 28 &&
       productsHeaderAudit.heading === "Our Complete Collection"
     ) {
       results.testD_category_separation.status = "PASS";
@@ -620,7 +624,7 @@ async function runTests() {
       `Product images verified: ${productImgs.length} rendered, ${failedImgs.length} failed to load.`
     );
 
-    // Verify all 24 products are represented in public/products/
+    // Verify all 28 products are represented in public/products/
     const expectedBrochureFiles = [
       "lord-ganesha.jpg",
       "maa-durga.jpg",
@@ -646,6 +650,10 @@ async function runTests() {
       "tara-devi.jpg",
       "lord-kubera.jpg",
       "lord-buddha.jpg",
+      "radha-krishna.jpg",
+      "vishnu-charan-paduka.jpg",
+      "brass-elephant-idols.jpg",
+      "brass-tortoise-idols.jpg",
     ];
 
     const missingFiles = [];
@@ -1356,10 +1364,10 @@ async function runTests() {
     await page.screenshot({ path: path.join(OUTPUT_DIR, "mobile_390_video_gallery.png"), fullPage: false });
 
     const allMedia200 =
-      mediaHttpChecks.length === 13 &&
+      mediaHttpChecks.length === 14 &&
       mediaHttpChecks.every((c) => c.vStatus === 200 && c.pStatus === 200);
     const allVideosLoadedMeta =
-      videoGalleryAudit?.videosDetail?.length === 13 &&
+      videoGalleryAudit?.videosDetail?.length === 14 &&
       videoGalleryAudit.videosDetail.every((v) => !v.hasError && v.readyState >= 1 && v.videoWidth > 0 && v.hasControls);
 
     results.testL_video_gallery_section.details.push(
@@ -1378,7 +1386,7 @@ async function runTests() {
       videoGalleryAudit.heading === "The Art in Motion" &&
       videoGalleryAudit.subtitle ===
         "Experience the beauty, craftsmanship and timeless details of our handcrafted brass sculptures." &&
-      videoGalleryAudit.videoCount === 13 &&
+      videoGalleryAudit.videoCount === 14 &&
       !videoGalleryAudit.hasCuratingPlaceholder &&
       carouselDesktopAudit?.singleHorizontalRow &&
       carouselDesktopAudit?.isScrollable &&

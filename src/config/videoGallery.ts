@@ -172,5 +172,14 @@ export const videoGalleryConfig: VideoGalleryConfig = {
       poster: "posters/poster-13.jpg",
       aspectRatio: "landscape",
     },
+    {
+      id: "lost-wax-casting-quenching",
+      src: "lost-wax-casting-quenching.mp4",
+      title: "Lost-Wax Casting & Water Quenching",
+      description:
+        "Master artisan retrieving freshly cast antique brass idol from the cooling bath, revealing raw intricate bronze details.",
+      poster: "posters/poster-14.jpg",
+      aspectRatio: "portrait",
+    },
   ],
 };

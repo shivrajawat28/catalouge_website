@@ -7,7 +7,7 @@ import { FloatingWhatsAppButton } from "@/components/WhatsAppButton";
 export const metadata: Metadata = {
   title: "Our Complete Collection | Advaita Tattva",
   description:
-    "Explore our complete collection of 24 handcrafted antique brass Buddha and Hindu deity idols, crafted with authentic lost-wax casting.",
+    "Explore our complete collection of handcrafted antique brass Buddha and Hindu deity idols, crafted with authentic lost-wax casting.",
 };
 
 export default function ProductsPage() {
