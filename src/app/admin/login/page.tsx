@@ -170,15 +170,12 @@ export default function AdminLoginPage() {
             </button>
           </form>
 
-          {/* Security Notice / Hint */}
+          {/* Security Notice */}
           <div className="mt-6 pt-5 border-t border-[#E7E0D4] text-center">
             <div className="flex items-center justify-center gap-1.5 text-[11px] text-[#785A1D]">
               <Sparkles className="w-3.5 h-3.5" />
-              <span className="font-medium">Administrator Access Only</span>
+              <span className="font-medium">Authorized Administrator Access Only</span>
             </div>
-            <p className="text-[10px] text-[#A8A29E] mt-1">
-              Default credentials: <code className="bg-[#FAF8F5] px-1 py-0.5 rounded border border-[#E7E0D4]">admin</code> / <code className="bg-[#FAF8F5] px-1 py-0.5 rounded border border-[#E7E0D4]">advaita@2026</code>
-            </p>
           </div>
         </div>
       </div>
